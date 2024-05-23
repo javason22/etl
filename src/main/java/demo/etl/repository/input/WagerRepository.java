@@ -1,14 +1,16 @@
 package demo.etl.repository.input;
 
-import demo.etl.entity.Wager;
-import demo.etl.entity.WagerSummary;
+import demo.etl.entity.input.Wager;
+import demo.etl.entity.output.WagerSummary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Repository
 public interface WagerRepository extends JpaRepository<Wager, Long> {
@@ -20,9 +22,11 @@ public interface WagerRepository extends JpaRepository<Wager, Long> {
      * @param pageable
      * @return
      */
-    @Query("SELECT new demo.etl.entity.WagerSummary(w.accountId, Date(w.wagerTimestamp), sum(w.wagerAmount)) " +
-            "FROM wager w " +
+    @Query("SELECT w.accountId, Date(w.wagerTimestamp), sum(w.wagerAmount) " +
+            "FROM Wager w " +
             "WHERE Date(w.wagerTimestamp) = :currentDate " +
             "GROUP BY w.accountId")
-    Page<WagerSummary> findWagerSummaries(Date currentDate, Pageable pageable);
+    Page<Object> findWagerSummaries(Date currentDate, Pageable pageable);
+
+    List<Wager> findByWagerTimestamp(LocalDate currentDate);
 }

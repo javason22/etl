@@ -1,6 +1,6 @@
 package demo.etl.service;
 
-import demo.etl.entity.Wager;
+import demo.etl.entity.input.Wager;
 import demo.etl.repository.input.WagerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -8,6 +8,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,8 +18,9 @@ public class WagerService {
     private final WagerRepository wagerRepository;
 
     @Cacheable(value = "wagerList", key = "#root.methodName + '_' + #example.hashCode() + '_' + #page + '_' + #size")
-    public Page<Wager> list(Wager example, int page, int size){
-        return wagerRepository.findAll(Example.of(example), PageRequest.of(page, size));
+    public Page<Wager> page(Wager example, int page, int size){
+        Sort sort = Sort.by(Sort.Order.asc("accountId"), Sort.Order.desc("wagerTimestamp"));
+        return wagerRepository.findAll(Example.of(example), PageRequest.of(page, size, sort));
     }
 
     @CacheEvict(value = "wagerList", allEntries = true)

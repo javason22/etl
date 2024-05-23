@@ -6,14 +6,24 @@ spring:
       port: 6379
       password:
       database: 0
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          time_zone: UTC
 # multiple datasource configuration
 app:
   datasource:
     input:
-      url: jdbc:mysql://localhost:3306/your_db_name
-      username: your_db_username
-      password: your_db_password
+      url: jdbc:mysql://localhost:3306/database_read
+      username: root
+      password: 123456
     output:
-      url: jdbc:mysql://localhost:3306/your_db_name
-      username: your_db_username
-      password: your_db_password
+      url: jdbc:mysql://localhost:3307/database_write
+      username: root
+      password: 123456

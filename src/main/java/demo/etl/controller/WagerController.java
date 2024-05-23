@@ -1,6 +1,7 @@
 package demo.etl.controller;
 
-import demo.etl.entity.Wager;
+import demo.etl.entity.input.Wager;
+import demo.etl.resp.WagerResponse;
 import demo.etl.service.WagerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,16 +25,24 @@ public class WagerController {
 
     private final WagerService wagerService;
 
-    @Operation(summary = "List all wagers")
+    @Operation(summary = "List all wagers with pagination")
+    @Parameters({@Parameter(name = "example", description = "Wager example", required = true),
+            @Parameter(name = "page", description = "Page number", required = true),
+            @Parameter(name = "size", description = "Page size", required = true)})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = """
                     List of wagers.
                     1. code=200, success.
                     2. code=400, parameters invalid.""")})
     @GetMapping("/list")
-    public ResponseEntity<Page<Wager>> list(@RequestParam Wager example, @RequestParam int page, @RequestParam int size){
+    public ResponseEntity<Page<WagerResponse>> list(@RequestParam Wager example, @RequestParam int page, @RequestParam int size){
         log.debug("List wagers example={}, page={}, size={}", example, page, size);
-        return ResponseEntity.ok(wagerService.list(example, page, size));
+        Page<Wager> result = wagerService.page(example, page, size);
+        return ResponseEntity.ok(result.map(wager -> WagerResponse.builder()
+                .id(wager.getId())
+                .wagerAmount(wager.getWagerAmount())
+                .wagerTimestamp(wager.getWagerTimestamp())
+                .accountId(wager.getAccountId()).build()));
     }
 
     @Operation(summary = "Add wager")
@@ -45,10 +54,16 @@ public class WagerController {
                     1. code=200, success.
                     2. code=400, parameters invalid.""")})
     @PutMapping("/add")
-    public ResponseEntity<Wager> add(Wager wager){
+    public ResponseEntity<WagerResponse> add(Wager wager){
         log.debug("Add wager={}", wager);
         try{
-            return ResponseEntity.ok(wagerService.add(wager));
+            wager = wagerService.add(wager);
+            return ResponseEntity.ok(
+                    WagerResponse.builder()
+                            .id(wager.getId())
+                            .wagerAmount(wager.getWagerAmount())
+                            .wagerTimestamp(wager.getWagerTimestamp())
+                            .accountId(wager.getAccountId()).build());
         } catch (Exception e){
             log.error("Error adding wager", e);
             return ResponseEntity.badRequest().build();
