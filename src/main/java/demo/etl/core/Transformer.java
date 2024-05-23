@@ -10,8 +10,7 @@ import java.util.List;
  *
  * @param <T> input type
  * @param <K> output type
- * @param <P> parameter type
  */
-public interface Transformer<T extends InputType, K extends OutputType, P> {
-    List<K> transform(List<T> data, P params);
+public interface Transformer<T extends InputType, K extends OutputType> {
+    List<K> transform(List<T> data);
 }

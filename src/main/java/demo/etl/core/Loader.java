@@ -3,26 +3,20 @@ package demo.etl.core;
 import demo.etl.entity.OutputType;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Interface for output data to another endpoint
  *
  * @param <T>
+ * @param <P> parameter for loading
  */
-public interface Loader<T extends OutputType, P> {
+public interface Loader<T extends OutputType> {
 
     /**
-     * Load data to another endpoint. It will clear all the data in the endpoint before loading
+     * Load data to another endpoint.
      *
      * @param data
      */
-    void load(List<T> data);
-
-    /**
-     * Load data to another endpoint. The function will clear data hit by the parameter before loading
-     *
-     * @param data
-     * @param param
-     */
-    void load(List<T> data, P param);
+    CompletableFuture<List<T>> load(List<T> data);
 }

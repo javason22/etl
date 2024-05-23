@@ -1,42 +1,58 @@
 package demo.etl.service;
 
-import demo.etl.core.DailyWagerSummaryTransformer;
-import demo.etl.core.WagerExtractor;
-import demo.etl.core.WagerSummaryLoader;
-import demo.etl.entity.input.Wager;
-import demo.etl.entity.output.WagerSummary;
+import demo.etl.core.AllWagerToWagerSummaryEtlProcessor;
+import demo.etl.core.DailyWagerToWagerSummaryEtlProcessor;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class EtlService {
 
+    private static final int BATCH_SIZE = 10;
 
-    private final WagerExtractor wagerExtractor;
-    private final WagerSummaryLoader wagerSummaryLoader;
-    private final DailyWagerSummaryTransformer dailyWagerSummaryTransformer;
+    private static final String WAGER_SUMMARY_LOCK = "wager-summary-lock";
 
+    private final DailyWagerToWagerSummaryEtlProcessor dailyWagerToWagerSummaryEtlProcessor;
 
+    private final AllWagerToWagerSummaryEtlProcessor allWagerToWagerSummaryEtlProcessor;
+
+    private final RedissonClient redissonClient;
+
+    @Transactional
     public void transformDailyWagerToWagerSummary(LocalDate currentDate) {
         log.info("Transforming wagers for date {} to wager summaries", currentDate);
-        List<Wager> wagers = wagerExtractor.extract(currentDate);
-        if(wagers.isEmpty()) {
-            log.warn("No wagers found for date {}", currentDate);
-            return;
+
+        RLock lock = redissonClient.getLock(WAGER_SUMMARY_LOCK);
+        try {
+            lock.lock();
+            // critical section
+            dailyWagerToWagerSummaryEtlProcessor.process(currentDate);
+        } finally {
+            lock.unlock();
         }
-        List<WagerSummary> wagerSummaries = dailyWagerSummaryTransformer.transform(wagers, currentDate);
-        if(wagerSummaries.isEmpty()){
-            log.warn("No wager summaries transformed for date {}", currentDate);
-            return;
+    }
+
+    @Transactional
+    public void transformAllWagerToWagerSummary() {
+        log.info("Transforming all wagers to wager summaries");
+
+        RLock lock = redissonClient.getLock(WAGER_SUMMARY_LOCK);
+        try {
+            lock.lock();
+            // critical section
+            allWagerToWagerSummaryEtlProcessor.process(PageRequest.of(0, BATCH_SIZE));
+        } finally {
+            lock.unlock();
         }
-        wagerSummaryLoader.load(wagerSummaries, currentDate);
-        log.info("Transformed {} wagers accounts", wagerSummaries.size());
     }
 }

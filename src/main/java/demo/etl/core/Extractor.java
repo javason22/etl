@@ -8,6 +8,7 @@ import java.util.List;
  * Interface for extracting data from a source
  *
  * @param <T>
+ * @param <P> parameter for extraction
  */
 public interface Extractor<T extends InputType, P> {
 
@@ -19,10 +20,4 @@ public interface Extractor<T extends InputType, P> {
      */
     List<T> extract(P param);
 
-    /**
-     * Extract data from a source
-     *
-     * @return List all the elements extracted from the source
-     */
-    List<T> extractAll();
 }

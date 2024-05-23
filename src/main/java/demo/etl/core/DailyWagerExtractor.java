@@ -12,7 +12,7 @@ import java.util.List;
 @Slf4j
 @AllArgsConstructor
 @Component
-public class WagerExtractor implements Extractor<Wager, LocalDate>{
+public class DailyWagerExtractor implements Extractor<Wager, LocalDate>{
 
     private final WagerRepository wagerRepository;
 
@@ -21,8 +21,4 @@ public class WagerExtractor implements Extractor<Wager, LocalDate>{
         return wagerRepository.findByWagerTimestamp(date);
     }
 
-    @Override
-    public List<Wager> extractAll() {
-        return wagerRepository.findAll();
-    }
 }
