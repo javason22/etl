@@ -31,35 +31,39 @@ public class EtlService {
 
     private final WagerSummaryRepository wagerSummaryRepository;
 
-    @Transactional(transactionManager = "outputTransactionManager")
+    //@Transactional(transactionManager = "outputTransactionManager")
     public void transformDailyWagersToWagerSummaries(LocalDate currentDate) {
         log.info("Transforming wagers for date {} to wager summaries", currentDate);
 
         RLock lock = redissonClient.getLock(WAGER_SUMMARY_LOCK);
         try {
             lock.lock();
+            log.info("Acquired lock {}", WAGER_SUMMARY_LOCK);
             // critical section
             // clear existing wager summaries for the date
             wagerSummaryRepository.deleteByWagerDate(currentDate);
             dailyWagerToWagerSummaryEtlProcessor.process(currentDate);
         } finally {
             lock.unlock();
+            log.info("Released lock {}", WAGER_SUMMARY_LOCK);
         }
     }
 
-    @Transactional(transactionManager = "outputTransactionManager")
+    //@Transactional(transactionManager = "outputTransactionManager")
     public void transformAllWagersToWagerSummaries() {
         log.info("Transforming all wagers to wager summaries");
 
         RLock lock = redissonClient.getLock(WAGER_SUMMARY_LOCK);
         try {
             lock.lock();
+            log.info("Acquired lock {}", WAGER_SUMMARY_LOCK);
             // critical section
             // clear all existing wager summaries
             wagerSummaryRepository.deleteAll();
             allWagerToWagerSummaryEtlProcessor.process(PageRequest.of(0, BATCH_SIZE));
         } finally {
             lock.unlock();
+            log.info("Released lock {}", WAGER_SUMMARY_LOCK);
         }
     }
 }

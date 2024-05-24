@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -52,10 +53,10 @@ public class AllWagerToWagerSummaryEtlProcessor extends EtlProcessor<Wager, Wage
                     .filter(wager -> wager.getAccountId().equals(accountId) || DateUtils.isSameDay(date, wager.getWagerTimestamp()))
                     .forEach(wager ->{
                         lastBatchWagers.add(wager);
-                        wagers.remove(wager);
+                        //wagers.remove(wager);
                     });
-
-            List<WagerSummary> wagerSummaries = transformer.transform(wagers);
+            List<Wager> reducedWagers = wagers.stream().filter(wager -> !lastBatchWagers.contains(wager)).collect(Collectors.toList());
+            List<WagerSummary> wagerSummaries = transformer.transform(reducedWagers);
             futures.add(loader.load(wagerSummaries));
 
             pageable = PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize(), pageable.getSort());
