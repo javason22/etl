@@ -8,8 +8,10 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +22,13 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @AllArgsConstructor
-@RequestMapping("/wager")
+@Tag(name = "Wager", description = "APIs for wager operations")
+@RequestMapping("/api/v1/wager")
 public class WagerController {
 
     private final WagerService wagerService;
+
+    private final RedissonClient redissonClient;
 
     @Operation(summary = "List all wagers with pagination")
     @Parameters({@Parameter(name = "example", description = "Wager example", required = true),
@@ -34,8 +39,8 @@ public class WagerController {
                     List of wagers.
                     1. code=200, success.
                     2. code=400, parameters invalid.""")})
-    @GetMapping("/list")
-    public ResponseEntity<Page<WagerResponse>> list(@RequestParam Wager example, @RequestParam int page, @RequestParam int size){
+    @GetMapping("/")
+    public ResponseEntity<Page<WagerResponse>> list(@RequestParam(required = false) Wager example, @RequestParam int page, @RequestParam int size){
         log.debug("List wagers example={}, page={}, size={}", example, page, size);
         Page<Wager> result = wagerService.page(example, page, size);
         return ResponseEntity.ok(result.map(wager -> WagerResponse.builder()
@@ -43,6 +48,17 @@ public class WagerController {
                 .wagerAmount(wager.getWagerAmount())
                 .wagerTimestamp(wager.getWagerTimestamp())
                 .accountId(wager.getAccountId()).build()));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<WagerResponse> get(@PathVariable String id){
+        log.debug("Get wager id={}", id);
+        Wager wager = wagerService.get(id);
+        return ResponseEntity.ok(WagerResponse.builder()
+                .id(wager.getId())
+                .wagerAmount(wager.getWagerAmount())
+                .wagerTimestamp(wager.getWagerTimestamp())
+                .accountId(wager.getAccountId()).build());
     }
 
     @Operation(summary = "Add wager")
@@ -53,8 +69,8 @@ public class WagerController {
                     Add wager.
                     1. code=200, success.
                     2. code=400, parameters invalid.""")})
-    @PutMapping("/add")
-    public ResponseEntity<WagerResponse> add(Wager wager){
+    @PutMapping("/")
+    public ResponseEntity<WagerResponse> add(@RequestBody Wager wager){
         log.debug("Add wager={}", wager);
         try{
             wager = wagerService.add(wager);
@@ -78,11 +94,11 @@ public class WagerController {
                     Update wager.
                     1. code=200, success.
                     2. code=400, parameters invalid.""")})
-    @PostMapping("/update")
-    public ResponseEntity<Boolean> update(Wager wager){
+    @PostMapping("/")
+    public ResponseEntity<Boolean> update(@RequestBody Wager wager){
         log.debug("Update wager={}", wager);
         try{
-            wagerService.update(wager);
+            Wager updatedWager = wagerService.update(wager);
             return ResponseEntity.ok(true);
         } catch (Exception e){
             log.error("Error updating wager", e);
@@ -98,8 +114,8 @@ public class WagerController {
                     Delete wager.
                     1. code=200, success.
                     2. code=400, parameters invalid.""")})
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Boolean> delete(@PathVariable Long id){
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> delete(@PathVariable String id){
         log.debug("Delete wager id={}", id);
         try{
             wagerService.delete(id);

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 
 @Repository
-public interface WagerSummaryRepository extends JpaRepository<WagerSummary, Long>{
+public interface WagerSummaryRepository extends JpaRepository<WagerSummary, String>{
 
     void deleteByWagerDate(LocalDate wagerTimestamp);
 }

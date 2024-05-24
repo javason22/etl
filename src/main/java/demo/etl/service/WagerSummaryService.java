@@ -34,7 +34,12 @@ public class WagerSummaryService {
     }
 
     @CacheEvict(value = "wagerSummaryList", allEntries = true)
-    public void delete(Long id){
+    public void delete(String id){
         wagerSummaryRepository.deleteById(id);
+    }
+
+    @Cacheable(value = "wagerSummary", key = "#id")
+    public WagerSummary get(String id){
+        return wagerSummaryRepository.findById(id).orElse(null);
     }
 }

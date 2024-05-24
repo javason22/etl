@@ -1,14 +1,21 @@
+#server setting
+server:
+  port: 8080
 #spring setting
 spring:
+  application:
+    name: etl
+  profiles:
+    active: dev
   data:
     redis:
       host: 127.0.0.1
       port: 6379
-      password:
+      #password:
       database: 0
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:

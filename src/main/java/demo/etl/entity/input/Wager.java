@@ -23,8 +23,9 @@ public class Wager implements Serializable, InputType {
     private static final long serialVersionUID = 163905306L;
 
     @Id
-    @Column(name = "ID", nullable = false)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "ID", nullable = false, columnDefinition = "VARCHAR(36)")
+    private String id;
 
     @Column(name = "ACCOUNT_ID", nullable = false)
     private String accountId;

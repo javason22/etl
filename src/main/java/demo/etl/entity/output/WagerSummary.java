@@ -22,8 +22,9 @@ public class WagerSummary implements Serializable, OutputType {
     private static final long serialVersionUID = 2359006129L;
 
     @Id
-    @Column(name = "ID")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "ID", nullable = false, columnDefinition = "VARCHAR(36)")
+    private String id;
 
     @Column(name = "ACCOUNT_ID", nullable = false)
     private String accountId;

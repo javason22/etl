@@ -4,6 +4,7 @@ import demo.etl.entity.input.Wager;
 import demo.etl.repository.input.WagerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -28,14 +29,20 @@ public class WagerService {
         return wagerRepository.save(wager);
     }
 
+    @CachePut(value = "wager", key = "#wager.id")
     @CacheEvict(value = "wagerList", allEntries = true)
     public Wager update(Wager wager){
         return wagerRepository.save(wager);
     }
 
     @CacheEvict(value = "wagerList", allEntries = true)
-    public void delete(Long id){
+    public void delete(String id){
         wagerRepository.deleteById(id);
+    }
+
+    @Cacheable(value = "wager", key = "#id")
+    public Wager get(String id){
+        return wagerRepository.findById(id).orElse(null);
     }
 
 }

@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 @Repository
-public interface WagerRepository extends JpaRepository<Wager, Long> {
+public interface WagerRepository extends JpaRepository<Wager, String> {
 
     /**
      * Find wager summary by wager timestamp

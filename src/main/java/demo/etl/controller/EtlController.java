@@ -1,6 +1,7 @@
 package demo.etl.controller;
 
 import demo.etl.service.EtlService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +14,9 @@ import java.time.LocalDate;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/etl")
+@RequestMapping("/api/v1/etl")
 @Slf4j
+@Tag(name = "ETL", description = "APIs for ETL operations")
 public class EtlController {
 
     private final EtlService etlService;
@@ -22,7 +24,7 @@ public class EtlController {
     @PostMapping("/daily-wager-summary/transform")
     public ResponseEntity<Void> triggerEtlTransform(@RequestParam LocalDate date) {
         log.info("Triggering ETL transform for date={}", date);
-        etlService.transformDailyWagerToWagerSummary(date);
+        etlService.transformDailyWagersToWagerSummaries(date);
         return ResponseEntity.ok().build();
     }
 }

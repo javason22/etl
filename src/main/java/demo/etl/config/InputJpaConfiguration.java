@@ -26,16 +26,6 @@ public class InputJpaConfiguration {
 
     @Autowired
     private Environment env;
-    /*@Bean
-    public LocalContainerEntityManagerFactoryBean inputEntityManagerFactory(
-            @Qualifier("readDataSource") DataSource dataSource,
-            EntityManagerFactoryBuilder builder) {
-        return builder
-                .dataSource(dataSource)
-                .packages("demo.etl.repository.input")
-                .persistenceUnit("input")
-                .build();
-    }*/
 
     @Bean
     public LocalContainerEntityManagerFactoryBean inputEntityManagerFactory(

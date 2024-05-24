@@ -25,16 +25,6 @@ public class OutputJpaConfiguration {
 
     @Autowired
     private Environment env;
-    /*@Bean
-    public LocalContainerEntityManagerFactoryBean outputEntityManagerFactory(
-            @Qualifier("writeDataSource") DataSource dataSource,
-            EntityManagerFactoryBuilder builder) {
-        return builder
-                .dataSource(dataSource)
-                .packages("demo.etl.repository.output")
-                .persistenceUnit("output")
-                .build();
-    }*/
 
     @Bean
     public LocalContainerEntityManagerFactoryBean outputEntityManagerFactory(

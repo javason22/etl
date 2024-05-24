@@ -9,7 +9,7 @@ import java.util.Date;
 @Data
 @Builder
 public class WagerResponse {
-    private Long id;
+    private String id;
     private String accountId;
     private BigDecimal wagerAmount;
     private Date wagerTimestamp;
