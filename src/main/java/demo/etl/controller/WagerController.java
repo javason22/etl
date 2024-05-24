@@ -12,7 +12,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,13 +24,11 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @AllArgsConstructor
-@Tag(name = "Wager", description = "APIs for wager operations")
+@Tag(name = "Wager", description = "APIs for wager operations. CRUD operations for wager.")
 @RequestMapping("/api/v1/wager")
 public class WagerController {
 
     private final WagerService wagerService;
-
-    private final RedissonClient redissonClient;
 
     @Operation(summary = "List all wagers with pagination")
     @Parameters({@Parameter(name = "example", description = "Wager example", required = true),
@@ -36,7 +36,7 @@ public class WagerController {
             @Parameter(name = "size", description = "Page size", required = true)})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = """
-                    List of wagers.
+                    Page of wagers.
                     1. code=200, success.
                     2. code=400, parameters invalid.""")})
     @GetMapping("/")
@@ -50,10 +50,22 @@ public class WagerController {
                 .accountId(wager.getAccountId()).build()));
     }
 
+    @Operation(summary = "Get wager by giving its unique ID in the URL.")
+    @Parameters({
+            @Parameter(name = "id", description = "Wager id", required = true)})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = """
+                    Get wager by ID.
+                    1. code=200, get wager successfully.
+                    2. code=400, parameters invalid.
+                    3. code=404, wager not found.""")})
     @GetMapping("/{id}")
     public ResponseEntity<WagerResponse> get(@PathVariable String id){
         log.debug("Get wager id={}", id);
         Wager wager = wagerService.get(id);
+        if(wager == null){
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(WagerResponse.builder()
                 .id(wager.getId())
                 .wagerAmount(wager.getWagerAmount())
@@ -61,68 +73,86 @@ public class WagerController {
                 .accountId(wager.getAccountId()).build());
     }
 
-    @Operation(summary = "Add wager")
+    @Operation(summary = "Create a new wager record by sending the full object of the wager without the unique ID.")
     @Parameters({
             @Parameter(name = "wager", description = "Wager object", required = true)})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = """
-                    Add wager.
-                    1. code=200, success.
-                    2. code=400, parameters invalid.""")})
-    @PutMapping("/")
+                    Create a new wager.
+                    1. code=201, wager created successfully.
+                    2. code=400, parameters invalid.
+                    3. code=422, duplicate wager creation.
+                    3. code=500, internal server error.""")})
+    @PostMapping("/")
     public ResponseEntity<WagerResponse> add(@RequestBody Wager wager){
         log.debug("Add wager={}", wager);
         try{
-            wager = wagerService.add(wager);
-            return ResponseEntity.ok(
+            Wager createdWager = wagerService.add(wager);
+            return ResponseEntity.status(HttpStatus.CREATED).body(
                     WagerResponse.builder()
-                            .id(wager.getId())
-                            .wagerAmount(wager.getWagerAmount())
-                            .wagerTimestamp(wager.getWagerTimestamp())
-                            .accountId(wager.getAccountId()).build());
+                            .id(createdWager.getId())
+                            .wagerAmount(createdWager.getWagerAmount())
+                            .wagerTimestamp(createdWager.getWagerTimestamp())
+                            .accountId(createdWager.getAccountId()).build());
+        } catch(DataIntegrityViolationException e){
+            log.error("Duplicate wager creation", e);
+            return ResponseEntity.unprocessableEntity().build();
         } catch (Exception e){
             log.error("Error adding wager", e);
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.internalServerError().build();
         }
     }
 
-    @Operation(summary = "Update wager")
+    @Operation(summary = "Update wager by sending the full object of the wager with the new values and unique ID.")
     @Parameters({
             @Parameter(name = "wager", description = "Wager object", required = true)})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = """
                     Update wager.
-                    1. code=200, success.
-                    2. code=400, parameters invalid.""")})
-    @PostMapping("/")
-    public ResponseEntity<Boolean> update(@RequestBody Wager wager){
+                    1. code=200, update wager successfully.
+                    2. code=400, parameters invalid.
+                    3. code=404, wager not found.
+                    3. code=500, internal server error.""")})
+    @PutMapping("/")
+    public ResponseEntity<WagerResponse> update(@RequestBody Wager wager){
         log.debug("Update wager={}", wager);
         try{
             Wager updatedWager = wagerService.update(wager);
-            return ResponseEntity.ok(true);
+            if(updatedWager == null){
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(WagerResponse.builder()
+                    .id(updatedWager.getId())
+                    .wagerAmount(updatedWager.getWagerAmount())
+                    .wagerTimestamp(updatedWager.getWagerTimestamp())
+                    .accountId(updatedWager.getAccountId()).build());
         } catch (Exception e){
             log.error("Error updating wager", e);
-            return ResponseEntity.ok(false);
+            return ResponseEntity.internalServerError().build();
         }
     }
 
-    @Operation(summary = "Delete wager by id")
+    @Operation(summary = "Delete wager by giving its unique ID in the URL.")
     @Parameters({
             @Parameter(name = "id", description = "Wager id", required = true)})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = """
                     Delete wager.
-                    1. code=200, success.
-                    2. code=400, parameters invalid.""")})
+                    1. code=204, Delete wager successfully. No content returned.
+                    2. code=400, parameters invalid.
+                    3. code=404, wager not found.
+                    4. code=500, internal server error.""")})
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> delete(@PathVariable String id){
+    public ResponseEntity<Void> delete(@PathVariable String id){
         log.debug("Delete wager id={}", id);
         try{
-            wagerService.delete(id);
-            return ResponseEntity.ok(true);
+            if(!wagerService.delete(id)) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.noContent().build();
         } catch (Exception e){
             log.error("Error deleting wager", e);
-            return ResponseEntity.ok(false);
+            return ResponseEntity.internalServerError().build();
         }
     }
 

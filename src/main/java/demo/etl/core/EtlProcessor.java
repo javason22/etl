@@ -1,13 +1,11 @@
 package demo.etl.core;
 
-import demo.etl.entity.InputType;
-import demo.etl.entity.OutputType;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 @Slf4j
-public abstract class EtlProcessor<T extends InputType, M extends OutputType, P> {
+public abstract class EtlProcessor<T, M, P> {
 
     protected Extractor<T, P> extractor;
     protected Transformer<T, M> transformer;

@@ -1,7 +1,5 @@
 package demo.etl.core;
 
-import demo.etl.entity.InputType;
-
 import java.util.List;
 
 /**
@@ -10,7 +8,7 @@ import java.util.List;
  * @param <T>
  * @param <P> parameter for extraction
  */
-public interface Extractor<T extends InputType, P> {
+public interface Extractor<T, P> {
 
     /**
      * Extract data from a source with certain parameter

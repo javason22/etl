@@ -31,7 +31,7 @@ public class EtlService {
 
     private final WagerSummaryRepository wagerSummaryRepository;
 
-    @Transactional
+    @Transactional(transactionManager = "outputTransactionManager")
     public void transformDailyWagersToWagerSummaries(LocalDate currentDate) {
         log.info("Transforming wagers for date {} to wager summaries", currentDate);
 
@@ -47,7 +47,7 @@ public class EtlService {
         }
     }
 
-    @Transactional
+    @Transactional(transactionManager = "outputTransactionManager")
     public void transformAllWagersToWagerSummaries() {
         log.info("Transforming all wagers to wager summaries");
 

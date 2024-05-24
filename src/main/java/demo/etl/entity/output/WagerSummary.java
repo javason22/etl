@@ -1,6 +1,5 @@
 package demo.etl.entity.output;
 
-import demo.etl.entity.OutputType;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +16,7 @@ import java.time.LocalDate;
         @UniqueConstraint(columnNames = {"ACCOUNT_ID", "WAGER_DATE"})
 })
 @Builder
-public class WagerSummary implements Serializable, OutputType {
+public class WagerSummary implements Serializable {
 
     private static final long serialVersionUID = 2359006129L;
 

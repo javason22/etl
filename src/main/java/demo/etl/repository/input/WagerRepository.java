@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -28,5 +30,5 @@ public interface WagerRepository extends JpaRepository<Wager, String> {
             "GROUP BY w.accountId")
     Page<Object> findWagerSummaries(Date currentDate, Pageable pageable);
 
-    List<Wager> findByWagerTimestamp(LocalDate currentDate);
+    List<Wager> findByWagerTimestampBetween(LocalDateTime start, LocalDateTime end);
 }

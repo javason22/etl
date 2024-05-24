@@ -18,7 +18,7 @@ public class DailyWagerExtractor implements Extractor<Wager, LocalDate>{
 
     @Override
     public List<Wager> extract(LocalDate date) {
-        return wagerRepository.findByWagerTimestamp(date);
+        return wagerRepository.findByWagerTimestampBetween(
+                date.atStartOfDay(), date.atTime(23, 59, 59, 999999999));
     }
-
 }

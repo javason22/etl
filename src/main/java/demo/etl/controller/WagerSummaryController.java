@@ -10,20 +10,21 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.redisson.api.RedissonClient;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @AllArgsConstructor
-@Tag(name = "WagerSummary", description = "APIs for wager summary operations")
+@Tag(name = "WagerSummary", description = "APIs for wager summary operations. CRUD operations for wager summary.")
 @RequestMapping("/api/v1/wager-summary")
 public class WagerSummaryController {
 
     private final WagerSummaryService wagerSummaryService;
-
-    private final RedissonClient redissonClient;
 
     @Operation(summary = "List all wager summaries with pagination")
     @Parameters({@Parameter(name = "example", description = "Wager summary example", required = true),
@@ -31,7 +32,7 @@ public class WagerSummaryController {
             @Parameter(name = "size", description = "Page size", required = true)})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = """
-                    List of wager summaries.
+                    Page of wager summaries.
                     1. code=200, success.
                     2. code=400, parameters invalid.""")})
     @GetMapping("/")
@@ -50,16 +51,27 @@ public class WagerSummaryController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = """
                     Add wager summary.
-                    1. code=200, success.
-                    2. code=400, parameters invalid.""")})
+                    1. code=201, Created wager summary successfully.
+                    2. code=400, parameters invalid.
+                    3. code=422, duplicate wager summary creation.
+                    4. code=500, internal server error.""")})
     @PostMapping("/")
     public ResponseEntity<WagerSummaryResponse> add(@RequestBody WagerSummary wagerSummary){
-        wagerSummary = wagerSummaryService.add(wagerSummary);
-        return ResponseEntity.ok(WagerSummaryResponse.builder()
-                .id(wagerSummary.getId())
-                .totalWagerAmount(wagerSummary.getTotalWagerAmount())
-                .wagerDate(wagerSummary.getWagerDate())
-                .accountId(wagerSummary.getAccountId()).build());
+        log.info("Add wager summary={}", wagerSummary);
+        try{
+            wagerSummary = wagerSummaryService.add(wagerSummary);
+            return ResponseEntity.status(HttpStatus.CREATED).body(WagerSummaryResponse.builder()
+                    .id(wagerSummary.getId())
+                    .totalWagerAmount(wagerSummary.getTotalWagerAmount())
+                    .wagerDate(wagerSummary.getWagerDate())
+                    .accountId(wagerSummary.getAccountId()).build());
+        }catch(DataIntegrityViolationException e){
+            log.error("Duplicate wager summary creation", e);
+            return ResponseEntity.unprocessableEntity().build();
+        }catch (Exception e){
+            log.error("Add wager summary failed", e);
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @Operation(summary = "Update wager summary")
@@ -69,15 +81,26 @@ public class WagerSummaryController {
             @ApiResponse(responseCode = "200", description = """
                     Update wager summary.
                     1. code=200, success.
-                    2. code=400, parameters invalid.""")})
+                    2. code=400, parameters invalid.
+                    3. code=404, wager summary not found.
+                    4. code=500, internal server error.""")})
     @PutMapping("/")
     public ResponseEntity<WagerSummaryResponse> update(@RequestBody WagerSummary wagerSummary){
-        wagerSummary = wagerSummaryService.update(wagerSummary);
-        return ResponseEntity.ok(WagerSummaryResponse.builder()
-                .id(wagerSummary.getId())
-                .totalWagerAmount(wagerSummary.getTotalWagerAmount())
-                .wagerDate(wagerSummary.getWagerDate())
-                .accountId(wagerSummary.getAccountId()).build());
+        log.info("Update wager summary={}", wagerSummary);
+        try{
+            wagerSummary = wagerSummaryService.update(wagerSummary);
+            if(wagerSummary == null){
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(WagerSummaryResponse.builder()
+                    .id(wagerSummary.getId())
+                    .totalWagerAmount(wagerSummary.getTotalWagerAmount())
+                    .wagerDate(wagerSummary.getWagerDate())
+                    .accountId(wagerSummary.getAccountId()).build());
+        }catch (Exception e){
+            log.error("Update wager summary failed", e);
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @Operation(summary = "Delete wager summary")
@@ -86,12 +109,22 @@ public class WagerSummaryController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = """
                     Delete wager summary.
-                    1. code=200, success.
-                    2. code=400, parameters invalid.""")})
+                    1. code=204, delete wager summary successfully.
+                    2. code=400, parameters invalid.
+                    3. code=404, wager summary not found.
+                    4. code=500, internal server error.""")})
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> delete(@PathVariable String id){
-        wagerSummaryService.delete(id);
-        return ResponseEntity.ok(true);
+    public ResponseEntity<Void> delete(@PathVariable String id){
+        log.info("Delete wager summary id={}", id);
+        try{
+            if(!wagerSummaryService.delete(id)) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.noContent().build();
+        }catch (Exception e){
+            log.error("Delete wager summary failed", e);
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @Operation(summary = "Get wager summary")
@@ -99,12 +132,16 @@ public class WagerSummaryController {
             @Parameter(name = "id", description = "Wager summary id", required = true)})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = """
-                    Get wager summary.
-                    1. code=200, success.
-                    2. code=400, parameters invalid.""")})
+                    Get wager summary by ID.
+                    1. code=200, get wager summary successfully.
+                    2. code=400, parameters invalid.
+                    3. code=404, wager summary not found.""")})
     @GetMapping("/{id}")
     public ResponseEntity<WagerSummaryResponse> get(@PathVariable String id){
         WagerSummary wagerSummary = wagerSummaryService.get(id);
+        if(wagerSummary == null){
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(WagerSummaryResponse.builder()
                 .id(wagerSummary.getId())
                 .totalWagerAmount(wagerSummary.getTotalWagerAmount())

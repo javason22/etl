@@ -1,7 +1,6 @@
 package demo.etl.entity.input;
 
 
-import demo.etl.entity.InputType;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
@@ -18,7 +17,7 @@ import java.util.Date;
         @UniqueConstraint(columnNames = {"ACCOUNT_ID", "WAGER_TIMESTAMP"})
 })
 @Builder
-public class Wager implements Serializable, InputType {
+public class Wager implements Serializable {
 
     private static final long serialVersionUID = 163905306L;
 

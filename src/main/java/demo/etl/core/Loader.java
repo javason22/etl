@@ -1,7 +1,5 @@
 package demo.etl.core;
 
-import demo.etl.entity.OutputType;
-
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -11,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
  * @param <T>
  * @param <P> parameter for loading
  */
-public interface Loader<T extends OutputType> {
+public interface Loader<T> {
 
     /**
      * Load data to another endpoint.
