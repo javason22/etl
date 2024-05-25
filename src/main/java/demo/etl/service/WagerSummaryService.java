@@ -14,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 @AllArgsConstructor
@@ -70,5 +72,13 @@ public class WagerSummaryService {
             return null;
         }
         return wagerSummaryRepository.findById(id).orElse(null);
+    }
+
+    @CacheEvict(value = "wagerSummaryList", allEntries = true, condition = "#result != null")
+    public List<WagerSummary> saveAll(List<WagerSummary> wagerSummaries){
+        List<WagerSummary> result = wagerSummaryRepository.saveAll(wagerSummaries);
+        // add the wager summary id to bloom filter in service layer
+        result.forEach(wagerSummary -> wagerSummaryBloomFilter.add(wagerSummary.getId()));
+        return result;
     }
 }

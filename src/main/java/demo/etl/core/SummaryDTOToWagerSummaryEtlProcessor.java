@@ -7,7 +7,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 
 @Slf4j
@@ -25,17 +27,19 @@ public class SummaryDTOToWagerSummaryEtlProcessor extends EtlProcessor<SummaryDT
     @Override
     public void process(Pageable pageable) {
         log.info("Processing wagers for page: {}", pageable);
+        List<CompletableFuture<List<WagerSummary>>> futures = new ArrayList<>();
         while (true) {
             List<SummaryDTO> summaryDTOs = extractor.extract(pageable);
             if (summaryDTOs.isEmpty()) {
                 break;
             }
             List<WagerSummary> wagerSummaries = transformer.transform(summaryDTOs);
-            loader.load(wagerSummaries);
+            futures.add(loader.load(wagerSummaries));
             if (summaryDTOs.size() < pageable.getPageSize()) {
                 break;
             }
             pageable = pageable.next();
         }
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).join();
     }
 }

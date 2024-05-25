@@ -5,9 +5,12 @@ import demo.etl.entity.output.WagerSummary;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.mockito.*;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 
@@ -30,17 +33,19 @@ public class AllWagerToWagerSummaryEtlProcessorTest {
     //@Mock
     @Mock
     private WagerExtractor allWagerExtractor;
-    @Mock
-    private WagerSummaryTransformer wagerSummaryTransformer;
+    //@Mock
     @Mock
     private WagerSummaryLoader wagerSummaryLoader;
-    @InjectMocks
+
     private WagerToWagerSummaryEtlProcessor allWagerToWagerSummaryEtlProcessor;
 
     @Captor
     private ArgumentCaptor<List<WagerSummary>> wagerSummaryCaptor;
 
-
+    @BeforeEach
+    public void setUp() {
+        allWagerToWagerSummaryEtlProcessor = new WagerToWagerSummaryEtlProcessor(allWagerExtractor, new WagerSummaryTransformer(), wagerSummaryLoader);
+    }
     @Test
     @SneakyThrows
     public void testProcess() {
@@ -124,31 +129,58 @@ public class AllWagerToWagerSummaryEtlProcessorTest {
         doReturn(wagers2Loop).when(allWagerExtractor).extract(argThat(secondPageMatcher));
         doReturn(wagers3Loop).when(allWagerExtractor).extract(argThat(thirdPageMatcher));
 
+        //doReturn(CompletableFuture.completedFuture(new ArrayList<>())).when(wagerSummaryLoader).load(wagerSummaryCaptor.capture());
         when(wagerSummaryLoader.load(any())).thenReturn(CompletableFuture.completedFuture(new ArrayList<>()));
+
+        /*List<List<WagerSummary>> capturedWagerSummaries = new ArrayList<>();
+        doAnswer(invocation -> {
+            List<WagerSummary> arg = invocation.getArgument(0);
+            // Now arg contains the list passed to load method
+            // You can add your assertions here
+            capturedWagerSummaries.add(arg);
+            return CompletableFuture.completedFuture(new ArrayList<>());
+        }).when(wagerSummaryLoader).load(any());*/
 
         // Act
         allWagerToWagerSummaryEtlProcessor.process(firstPage);
 
         // Assert
         verify(wagerSummaryLoader, times(4)).load(wagerSummaryCaptor.capture());
+
         List<List<WagerSummary>> capturedWagerSummaries = wagerSummaryCaptor.getAllValues();
         assertEquals(2, capturedWagerSummaries.get(0).size());
         assertEquals(2, capturedWagerSummaries.get(1).size());
-        assertEquals(2, capturedWagerSummaries.get(2).size());
-        assertEquals(0, capturedWagerSummaries.get(3).size());
+        assertEquals(1, capturedWagerSummaries.get(2).size());
+        assertEquals(1, capturedWagerSummaries.get(3).size());
 
-        assertEquals(6, capturedWagerSummaries.size());
-
-        assertEquals(new BigDecimal("300.02"), capturedWagerSummaries.stream().filter(wagerSummary -> capturedWagerSummaries.get(0).get(0).getAccountId().equals("00001") && capturedWagerSummaries.get(0).get(0).getWagerDate().isEqual(LocalDate.of(2024, 1, 1))));
-        assertEquals(new BigDecimal("100.02"), capturedWagerSummaries.stream().filter(wagerSummary -> capturedWagerSummaries.get(0).get(1).getAccountId().equals("00001") && capturedWagerSummaries.get(0).get(0).getWagerDate().isEqual(LocalDate.of(2024, 1, 2))));
-        assertEquals(new BigDecimal("700.02"), capturedWagerSummaries.stream().filter(wagerSummary -> capturedWagerSummaries.get(1).get(0).getAccountId().equals("00002") && capturedWagerSummaries.get(0).get(0).getWagerDate().isEqual(LocalDate.of(2024, 1, 1))));
-        assertEquals(new BigDecimal("600.02"), capturedWagerSummaries.stream().filter(wagerSummary -> capturedWagerSummaries.get(1).get(1).getAccountId().equals("00002") && capturedWagerSummaries.get(0).get(0).getWagerDate().isEqual(LocalDate.of(2024, 1, 2))));
-        assertEquals(new BigDecimal("1600.03"), capturedWagerSummaries.stream().filter(wagerSummary -> capturedWagerSummaries.get(2).get(0).getAccountId().equals("00003") && capturedWagerSummaries.get(0).get(0).getWagerDate().isEqual(LocalDate.of(2024, 1, 1))));
-        assertEquals(new BigDecimal("600.02"), capturedWagerSummaries.stream().filter(wagerSummary -> capturedWagerSummaries.get(2).get(1).getAccountId().equals("00003") && capturedWagerSummaries.get(0).get(0).getWagerDate().isEqual(LocalDate.of(2024, 1, 3))));
+        for(List<WagerSummary> wagerSummaries : capturedWagerSummaries) {
+            for(WagerSummary wagerSummary : wagerSummaries) {
+                log.debug("WagerSummary: {}", wagerSummary);
+                if(wagerSummary.getAccountId().equals("00001")) {
+                    if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
+                        assertEquals(new BigDecimal("300.02"), wagerSummary.getTotalWagerAmount());
+                    } else if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 2))) {
+                        assertEquals(new BigDecimal("100.02"), wagerSummary.getTotalWagerAmount());
+                    }
+                } else if(wagerSummary.getAccountId().equals("00002")) {
+                    if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
+                        assertEquals(new BigDecimal("700.02"), wagerSummary.getTotalWagerAmount());
+                    } else if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 2))) {
+                        assertEquals(new BigDecimal("1000.03"), wagerSummary.getTotalWagerAmount());
+                    }
+                } else if(wagerSummary.getAccountId().equals("00003")) {
+                    if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
+                        assertEquals(new BigDecimal("1100.02"), wagerSummary.getTotalWagerAmount());
+                    } else if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 3))) {
+                        assertEquals(new BigDecimal("600.01"), wagerSummary.getTotalWagerAmount());
+                    }
+                }
+            }
+        }
 
         verify(allWagerExtractor).extract(argThat(firstPageMatcher));
         verify(allWagerExtractor).extract(argThat(secondPageMatcher));
         verify(allWagerExtractor).extract(argThat(thirdPageMatcher));
-        verify(wagerSummaryTransformer).transform(any());
+
     }
 }

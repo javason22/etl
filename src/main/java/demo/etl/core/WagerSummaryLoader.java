@@ -2,6 +2,7 @@ package demo.etl.core;
 
 import demo.etl.entity.output.WagerSummary;
 import demo.etl.repository.output.WagerSummaryRepository;
+import demo.etl.service.WagerSummaryService;
 import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -13,13 +14,13 @@ import java.util.concurrent.CompletableFuture;
 @AllArgsConstructor
 public class WagerSummaryLoader implements Loader<WagerSummary>{
 
-    private final WagerSummaryRepository wagerSummaryRepository;
+    private final WagerSummaryService wagerSummaryService;
 
 
     @Async
     @Override
     public CompletableFuture<List<WagerSummary>> load(List<WagerSummary> data) {
-        List<WagerSummary> result = wagerSummaryRepository.saveAll(data);
+        List<WagerSummary> result = wagerSummaryService.saveAll(data);
         return CompletableFuture.completedFuture(result);
     }
 
