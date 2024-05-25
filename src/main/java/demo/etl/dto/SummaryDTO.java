@@ -1,5 +1,6 @@
 package demo.etl.dto;
 
+import demo.etl.entity.InputType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Tolerate;
@@ -15,7 +16,7 @@ import java.time.LocalDate;
 @Slf4j
 @Data
 @AllArgsConstructor
-public class SummaryDTO {
+public class SummaryDTO implements InputType<SummaryDTO> {
     private String accountId;
     private LocalDate wagerDate;
     private BigDecimal totalWagerAmount;
@@ -24,5 +25,11 @@ public class SummaryDTO {
         this.accountId = accountId;
         this.wagerDate = wagerDate.toLocalDate();
         this.totalWagerAmount = totalWagerAmount;
+    }
+
+    @Override
+    public boolean sameGroupToTransform(SummaryDTO comparedTo) {
+        // no grouping for summary DTO
+        return false;
     }
 }

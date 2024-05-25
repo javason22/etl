@@ -1,10 +1,12 @@
 package demo.etl.entity.input;
 
 
+import demo.etl.entity.InputType;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Tolerate;
+import org.apache.commons.lang3.time.DateUtils;
 
 
 import java.io.Serializable;
@@ -17,7 +19,7 @@ import java.util.Date;
         @UniqueConstraint(columnNames = {"ACCOUNT_ID", "WAGER_TIMESTAMP"})
 })
 @Builder
-public class Wager implements Serializable {
+public class Wager implements Serializable, InputType<Wager>{
 
     private static final long serialVersionUID = 163905306L;
 
@@ -39,4 +41,12 @@ public class Wager implements Serializable {
     public Wager() {
 
     }
+
+    @Override
+    public boolean sameGroupToTransform(Wager comparedTo) {
+        // same group if same account id and same day of wager timestamp
+        return comparedTo.getAccountId().equals(accountId) && DateUtils.isSameDay(wagerTimestamp, comparedTo.getWagerTimestamp());
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package demo.etl.core;
 
+import demo.etl.dto.req.EtlRequest;
 import demo.etl.entity.input.Wager;
 import demo.etl.entity.output.WagerSummary;
 import lombok.SneakyThrows;
@@ -8,9 +9,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.*;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 
@@ -28,7 +27,7 @@ import static org.mockito.Mockito.*;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
-public class AllWagerToWagerSummaryEtlProcessorTest {
+public class WagerToWagerSummaryEtlProcessorTest {
 
     //@Mock
     @Mock
@@ -51,7 +50,8 @@ public class AllWagerToWagerSummaryEtlProcessorTest {
     public void testProcess() {
         // Arrange
         Sort sort = Sort.by(Sort.Order.asc("accountId"), Sort.Order.asc("wagerTimestamp"));
-        Pageable firstPage = PageRequest.of(0, 5, sort); // initial page
+        //Pageable firstPage = PageRequest.of(0, 5, sort); // initial page
+        EtlRequest request = new EtlRequest("2024-01-01", "2024-01-05");
         // create 12 mock wagers data
         Wager wager1 = Wager.builder()
                 .accountId("00001")
@@ -114,9 +114,9 @@ public class AllWagerToWagerSummaryEtlProcessorTest {
                 .wagerTimestamp(DateUtils.parseDate("2024-01-03 08:00:00", "yyyy-MM-dd hh:mm:ss")).build();
 
         // custom matchers to verify the pageable of 3 pages extraction
-        ArgumentMatcher<Pageable> firstPageMatcher = pageable -> pageable.getPageNumber() == 0 && pageable.getPageSize() == 5;
-        ArgumentMatcher<Pageable> secondPageMatcher = pageable -> pageable.getPageNumber() == 1 && pageable.getPageSize() == 5;
-        ArgumentMatcher<Pageable> thirdPageMatcher = pageable -> pageable.getPageNumber() == 2 && pageable.getPageSize() == 5;
+        //ArgumentMatcher<Pageable> firstPageMatcher = pageable -> pageable.getPageNumber() == 0 && pageable.getPageSize() == 5;
+        //ArgumentMatcher<Pageable> secondPageMatcher = pageable -> pageable.getPageNumber() == 1 && pageable.getPageSize() == 5;
+        //ArgumentMatcher<Pageable> thirdPageMatcher = pageable -> pageable.getPageNumber() == 2 && pageable.getPageSize() == 5;
 
         List<Wager> wagers1Loop = new ArrayList<>();
         wagers1Loop.addAll(Arrays.asList(wager1, wager2, wager3, wager4, wager5));
@@ -125,24 +125,14 @@ public class AllWagerToWagerSummaryEtlProcessorTest {
         List<Wager> wagers3Loop = new ArrayList<>();
         wagers3Loop.addAll(Arrays.asList(wager11, wager12));
 
-        doReturn(wagers1Loop).when(allWagerExtractor).extract(argThat(firstPageMatcher));
-        doReturn(wagers2Loop).when(allWagerExtractor).extract(argThat(secondPageMatcher));
-        doReturn(wagers3Loop).when(allWagerExtractor).extract(argThat(thirdPageMatcher));
+        doReturn(wagers1Loop).when(allWagerExtractor).extract(request, 0, 5);
+        doReturn(wagers2Loop).when(allWagerExtractor).extract(request, 1, 5);
+        doReturn(wagers3Loop).when(allWagerExtractor).extract(request, 2, 5);
 
-        //doReturn(CompletableFuture.completedFuture(new ArrayList<>())).when(wagerSummaryLoader).load(wagerSummaryCaptor.capture());
         when(wagerSummaryLoader.load(any())).thenReturn(CompletableFuture.completedFuture(new ArrayList<>()));
 
-        /*List<List<WagerSummary>> capturedWagerSummaries = new ArrayList<>();
-        doAnswer(invocation -> {
-            List<WagerSummary> arg = invocation.getArgument(0);
-            // Now arg contains the list passed to load method
-            // You can add your assertions here
-            capturedWagerSummaries.add(arg);
-            return CompletableFuture.completedFuture(new ArrayList<>());
-        }).when(wagerSummaryLoader).load(any());*/
-
         // Act
-        allWagerToWagerSummaryEtlProcessor.process(firstPage);
+        allWagerToWagerSummaryEtlProcessor.process(request, 5);
 
         // Assert
         verify(wagerSummaryLoader, times(4)).load(wagerSummaryCaptor.capture());
@@ -178,9 +168,13 @@ public class AllWagerToWagerSummaryEtlProcessorTest {
             }
         }
 
-        verify(allWagerExtractor).extract(argThat(firstPageMatcher));
-        verify(allWagerExtractor).extract(argThat(secondPageMatcher));
-        verify(allWagerExtractor).extract(argThat(thirdPageMatcher));
+        //verify(allWagerExtractor).extract(argThat(firstPageMatcher));
+        //verify(allWagerExtractor).extract(argThat(secondPageMatcher));
+        //verify(allWagerExtractor).extract(argThat(thirdPageMatcher));
+
+        verify(allWagerExtractor).extract(request, 0, 5);
+        verify(allWagerExtractor).extract(request, 1, 5);
+        verify(allWagerExtractor).extract(request, 2, 5);
 
     }
 }

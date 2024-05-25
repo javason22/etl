@@ -1,5 +1,7 @@
 package demo.etl.core;
 
+import demo.etl.entity.InputType;
+
 import java.util.List;
 
 /**
@@ -8,14 +10,16 @@ import java.util.List;
  * @param <T>
  * @param <P> parameter for extraction
  */
-public interface Extractor<T, P> {
+public interface Extractor<T extends InputType<T>, P> {
 
     /**
      * Extract data from a source with certain parameter
      *
      * @param param parameter for extraction
+     * @param page page number
+     * @param size page size
      * @return List of elements extracted from the source
      */
-    List<T> extract(P param);
+    List<T> extract(P param, int page, int size);
 
 }

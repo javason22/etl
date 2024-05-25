@@ -1,5 +1,6 @@
 package demo.etl.core;
 
+import demo.etl.dto.req.EtlRequest;
 import demo.etl.entity.input.Wager;
 import demo.etl.entity.output.WagerSummary;
 
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class WagerToWagerSummaryEtlProcessor extends EtlProcessor<Wager, WagerSummary, Pageable>{
+public class WagerToWagerSummaryEtlProcessor extends EtlProcessor<Wager, WagerSummary, EtlRequest>{
 
     public WagerToWagerSummaryEtlProcessor(WagerExtractor allWagerExtractor,
                                            WagerSummaryTransformer allWagerSummaryTransformer,
@@ -27,7 +28,7 @@ public class WagerToWagerSummaryEtlProcessor extends EtlProcessor<Wager, WagerSu
         this.loader = allWagerSummaryLoader;
     }
 
-    @Override
+    /*@Override
     public void process(Pageable pageable) {
         log.info("Processing wagers for page: {}", pageable);
         List<Wager> lastBatchWagers = new ArrayList<>();
@@ -62,5 +63,5 @@ public class WagerToWagerSummaryEtlProcessor extends EtlProcessor<Wager, WagerSu
             pageable = pageable.next();
         }
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).join();
-    }
+    }*/
 }

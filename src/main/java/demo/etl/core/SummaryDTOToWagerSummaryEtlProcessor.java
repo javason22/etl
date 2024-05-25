@@ -1,6 +1,7 @@
 package demo.etl.core;
 
 import demo.etl.dto.SummaryDTO;
+import demo.etl.dto.req.EtlRequest;
 import demo.etl.entity.output.WagerSummary;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -14,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Component
-public class SummaryDTOToWagerSummaryEtlProcessor extends EtlProcessor<SummaryDTO, WagerSummary, Pageable>{
+public class SummaryDTOToWagerSummaryEtlProcessor extends EtlProcessor<SummaryDTO, WagerSummary, EtlRequest>{
 
     public SummaryDTOToWagerSummaryEtlProcessor(SummaryDTOExtractor summaryDTOExtractor,
                                                 SummaryDTOTransformer summaryDTOTransformer,
@@ -24,7 +25,7 @@ public class SummaryDTOToWagerSummaryEtlProcessor extends EtlProcessor<SummaryDT
         this.loader = wagerSummaryLoader;
     }
 
-    @Override
+    /*@Override
     public void process(Pageable pageable) {
         log.info("Processing wagers for page: {}", pageable);
         List<CompletableFuture<List<WagerSummary>>> futures = new ArrayList<>();
@@ -41,5 +42,5 @@ public class SummaryDTOToWagerSummaryEtlProcessor extends EtlProcessor<SummaryDT
             pageable = pageable.next();
         }
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).join();
-    }
+    }*/
 }

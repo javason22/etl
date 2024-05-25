@@ -1,5 +1,7 @@
 package demo.etl.controller;
 
+import demo.etl.dto.req.EtlRequest;
+import demo.etl.dto.resp.EtlResponse;
 import demo.etl.service.EtlService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -7,11 +9,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -31,30 +31,18 @@ public class EtlV2Controller {
                     Trigger ETL transform for all wagers to wager summaries.
                     1. code=204, transform successfully.
                     2. code=500, internal server error.""")})
-    @PostMapping("/transformation")
-    public ResponseEntity<Void> triggerEtlTransform() {
+    @PostMapping("/trigger")
+    public ResponseEntity<EtlResponse> triggerEtlTransform(@RequestBody(required = false) EtlRequest request) {
+        if(request != null && (request.getStartDate() == null || request.getEndDate() == null)) {
+            return ResponseEntity.badRequest().body(new EtlResponse("failed", "Invalid request parameters"));
+        }
         log.info("Triggering V2 ETL transform for all wagers to wager summaries");
-        etlService.transformSummaryDTOToWagerSummaries();
-        return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "Trigger V2 ETL transform for daily wagers to wager summaries")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = """
-                    Trigger ETL transform for daily wagers to wager summaries.
-                    1. code=204, transform successfully.
-                    2. code=500, internal server error.""")})
-    @PostMapping("/transformation/{date}")
-    public ResponseEntity<Void> triggerDailyEtlTransform(@PathVariable String date) {
-        log.info("Triggering V2 ETL transform for daily wagers to wager summaries");
-        try{
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate dateObj = LocalDate.parse(date, formatter);
-            etlService.transformDailySummaryDTOToWagerSummaries(dateObj);
-            return ResponseEntity.noContent().build();
+        try {
+            etlService.transformSummaryDTOToWagerSummaries(request);
+            return ResponseEntity.accepted().body(new EtlResponse("accepted", "ETL process has been triggered"));
         } catch (Exception e) {
             log.error("Failed to transform daily wagers to wager summaries", e);
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new EtlResponse("failed", "Failed to trigger ETL process"));
         }
     }
 }
