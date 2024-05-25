@@ -19,12 +19,12 @@ import static org.mockito.Mockito.when;
 public class AllWagerExtractorTest {
 
     private WagerRepository wagerRepository;
-    private AllWagerExtractor allWagerExtractor;
+    private WagerExtractor allWagerExtractor;
 
     @BeforeEach
     public void setUp() {
         wagerRepository = Mockito.mock(WagerRepository.class);
-        allWagerExtractor = new AllWagerExtractor(wagerRepository);
+        allWagerExtractor = new WagerExtractor(wagerRepository);
     }
 
     @Test

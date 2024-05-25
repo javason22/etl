@@ -2,11 +2,9 @@ package demo.etl.core;
 
 import demo.etl.entity.input.Wager;
 import demo.etl.entity.output.WagerSummary;
-import demo.etl.repository.input.WagerRepository;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -18,7 +16,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,13 +29,13 @@ public class AllWagerToWagerSummaryEtlProcessorTest {
 
     //@Mock
     @Mock
-    private AllWagerExtractor allWagerExtractor;
+    private WagerExtractor allWagerExtractor;
     @Mock
     private WagerSummaryTransformer wagerSummaryTransformer;
     @Mock
     private WagerSummaryLoader wagerSummaryLoader;
     @InjectMocks
-    private AllWagerToWagerSummaryEtlProcessor allWagerToWagerSummaryEtlProcessor;
+    private WagerToWagerSummaryEtlProcessor allWagerToWagerSummaryEtlProcessor;
 
     @Captor
     private ArgumentCaptor<List<WagerSummary>> wagerSummaryCaptor;

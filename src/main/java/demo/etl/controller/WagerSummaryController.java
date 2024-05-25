@@ -1,8 +1,8 @@
 package demo.etl.controller;
 
 import demo.etl.entity.output.WagerSummary;
-import demo.etl.req.WagerSummaryRequest;
-import demo.etl.resp.WagerSummaryResponse;
+import demo.etl.dto.req.WagerSummaryRequest;
+import demo.etl.dto.resp.WagerSummaryResponse;
 import demo.etl.service.WagerSummaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -85,7 +85,8 @@ public class WagerSummaryController {
 
     @Operation(summary = "Update wager summary")
     @Parameters({
-            @Parameter(name = "wagerSummary", description = "Wager summary object", required = true)})
+            @Parameter(name = "id", description = "Wager summary id", required = true),
+            @Parameter(name = "request", description = "Wager summary object", required = true)})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = """
                     Update wager summary.
@@ -93,10 +94,15 @@ public class WagerSummaryController {
                     2. code=400, parameters invalid.
                     3. code=404, wager summary not found.
                     4. code=500, internal server error.""")})
-    @PutMapping("/")
-    public ResponseEntity<WagerSummaryResponse> update(@RequestBody WagerSummary wagerSummary){
-        log.info("Update wager summary={}", wagerSummary);
+    @PutMapping("/{id}")
+    public ResponseEntity<WagerSummaryResponse> update(@PathVariable String id, @RequestBody WagerSummaryRequest request){
+        log.info("Update wager summary={}", request);
         try{
+            WagerSummary wagerSummary = WagerSummary.builder()
+                    .id(id)
+                    .accountId(request.getAccountId())
+                    .totalWagerAmount(request.getTotalWagerAmount())
+                    .wagerDate(request.getWagerDate()).build();
             wagerSummary = wagerSummaryService.update(wagerSummary);
             if(wagerSummary == null){
                 return ResponseEntity.notFound().build();

@@ -1,8 +1,8 @@
 package demo.etl.controller;
 
 import demo.etl.entity.input.Wager;
-import demo.etl.req.WagerRequest;
-import demo.etl.resp.WagerResponse;
+import demo.etl.dto.req.WagerRequest;
+import demo.etl.dto.resp.WagerResponse;
 import demo.etl.service.WagerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -113,7 +112,8 @@ public class WagerController {
 
     @Operation(summary = "Update wager by sending the full object of the wager with the new values and unique ID.")
     @Parameters({
-            @Parameter(name = "wager", description = "Wager object", required = true)})
+            @Parameter(name = "id", description = "Wager id", required = true),
+            @Parameter(name = "request", description = "Wager object", required = true)})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = """
                     Update wager.
@@ -121,10 +121,14 @@ public class WagerController {
                     2. code=400, parameters invalid.
                     3. code=404, wager not found.
                     3. code=500, internal server error.""")})
-    @PutMapping("/")
-    public ResponseEntity<WagerResponse> update(@RequestBody Wager wager){
-        log.debug("Update wager={}", wager);
+    @PutMapping("/{id}")
+    public ResponseEntity<WagerResponse> update(@PathVariable String id, @RequestBody WagerRequest request){
+        log.debug("Update wager={}", request);
         try{
+            Wager wager = Wager.builder()
+                    .id(id)
+                    .accountId(request.getAccountId())
+                    .wagerAmount(request.getWagerAmount()).build();
             Wager updatedWager = wagerService.update(wager);
             if(updatedWager == null){
                 return ResponseEntity.notFound().build();

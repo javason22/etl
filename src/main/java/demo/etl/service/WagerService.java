@@ -29,7 +29,7 @@ public class WagerService {
         return wagerRepository.findAll(Example.of(example), PageRequest.of(page, size, sort));
     }
 
-    @CacheEvict(value = "wagerList", allEntries = true)
+    @CacheEvict(value = "wagerList", allEntries = true, condition = "#result != null")
     public Wager add(Wager wager){
         Wager result = wagerRepository.save(wager);
         // add the wager id to bloom filter in service layer
@@ -37,8 +37,8 @@ public class WagerService {
         return result;
     }
 
-    @CachePut(value = "wager", key = "#wager.id")
-    @CacheEvict(value = "wagerList", allEntries = true)
+    @CachePut(value = "wager", key = "#wager.id", unless = "#result == null")
+    @CacheEvict(value = "wagerList", allEntries = true, condition = "#result != null")
     public Wager update(Wager wager){
         // check if the wager id exists in bloom filter
         if(!wagerBloomFilter.contains(wager.getId())){
@@ -48,7 +48,7 @@ public class WagerService {
         return wagerRepository.save(wager);
     }
 
-    @CacheEvict(value = "wagerList", allEntries = true)
+    @CacheEvict(value = "wagerList", allEntries = true, condition = "#result")
     public boolean delete(String id){
         // check if the wager id exists in bloom filter
         if(!wagerBloomFilter.contains(id)){

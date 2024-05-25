@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBloomFilter;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -28,7 +29,7 @@ public class WagerSummaryService {
         return wagerSummaryRepository.findAll(Example.of(example), PageRequest.of(page, size, sort));
     }
 
-    @CacheEvict(value = "wagerSummaryList", allEntries = true)
+    @CacheEvict(value = "wagerSummaryList", allEntries = true, condition = "#result != null")
     public WagerSummary add(WagerSummary wagerSummary){
         WagerSummary result = wagerSummaryRepository.save(wagerSummary);
         // add the wager summary id to bloom filter in service layer
@@ -36,7 +37,8 @@ public class WagerSummaryService {
         return result;
     }
 
-    @CacheEvict(value = "wagerSummaryList", allEntries = true)
+    @CachePut(value = "wagerSummary", key = "#wagerSummary.id", unless = "#result == null")
+    @CacheEvict(value = "wagerSummaryList", allEntries = true, condition = "#result != null")
     public WagerSummary update(WagerSummary wagerSummary){
         // check if the wager summary id exists in bloom filter
         if(!wagerSummaryBloomFilter.contains(wagerSummary.getId())){
@@ -46,7 +48,7 @@ public class WagerSummaryService {
         return wagerSummaryRepository.save(wagerSummary);
     }
 
-    @CacheEvict(value = "wagerSummaryList", allEntries = true)
+    @CacheEvict(value = "wagerSummaryList", allEntries = true, condition = "#result")
     public boolean delete(String id){
         // check if the wager summary id exists in bloom filter
         if(!wagerSummaryBloomFilter.contains(id)){
@@ -60,7 +62,7 @@ public class WagerSummaryService {
         return true;
     }
 
-    @Cacheable(value = "wagerSummary", key = "#id")
+    @Cacheable(value = "wagerSummary", key = "#id", unless = "#result == null")
     public WagerSummary get(String id){
         // check if the wager summary id exists in bloom filter
         if(!wagerSummaryBloomFilter.contains(id)){

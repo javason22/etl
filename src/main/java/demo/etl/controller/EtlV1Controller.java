@@ -11,10 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -23,12 +20,12 @@ import java.time.format.DateTimeFormatter;
 @RestController
 @RequestMapping("/api/v1/etl")
 @Slf4j
-@Tag(name = "ETL", description = "APIs for ETL transformation. Trigger ETL transform for daily wagers to wager summaries.")
-public class EtlController {
+@Tag(name = "ETL", description = "Version 1 APIs for ETL transformation. Trigger ETL transform for daily wagers to wager summaries.")
+public class EtlV1Controller {
 
     private final EtlService etlService;
 
-    @Operation(summary = "Trigger ETL transform for daily wagers to wager summaries")
+    @Operation(summary = "Trigger V1 ETL transform for daily wagers to wager summaries")
     @Parameters({@Parameter(name = "date", description = "Date of the wagers (yyyy-MM-dd)", required = true)})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = """
@@ -36,8 +33,8 @@ public class EtlController {
                     1. code=204, transform successfully.
                     2. code=400, parameters invalid.
                     3. code=500, internal server error.""")})
-    @PostMapping("/transformation/daily")
-    public ResponseEntity<Void> triggerEtlTransform(@RequestParam String date) {
+    @PostMapping("/transformation/{date}")
+    public ResponseEntity<Void> triggerEtlTransform(@PathVariable String date) {
         log.info("Triggering ETL transform for date={}", date);
         try{
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -50,13 +47,13 @@ public class EtlController {
         }
     }
 
-    @Operation(summary = "Trigger ETL transform for all existing wagers to wager summaries")
+    @Operation(summary = "Trigger V1 ETL transform for all existing wagers to wager summaries")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = """
                     Trigger ETL transform for all existing wagers to wager summaries.
                     1. code=204, transform successfully.
                     2. code=500, internal server error.""")})
-    @PostMapping("/transformation/all")
+    @PostMapping("/transformation")
     public ResponseEntity<Void> triggerEtlTransform() {
         log.info("Triggering ETL transform for all existing wagers");
         try{

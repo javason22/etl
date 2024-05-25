@@ -1,4 +1,4 @@
-package demo.etl.resp;
+package demo.etl.dto.resp;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;

@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class AllWagerToWagerSummaryEtlProcessor extends EtlProcessor<Wager, WagerSummary, Pageable>{
+public class WagerToWagerSummaryEtlProcessor extends EtlProcessor<Wager, WagerSummary, Pageable>{
 
-    public AllWagerToWagerSummaryEtlProcessor(AllWagerExtractor allWagerExtractor,
-                                              WagerSummaryTransformer allWagerSummaryTransformer,
-                                              WagerSummaryLoader allWagerSummaryLoader) {
+    public WagerToWagerSummaryEtlProcessor(WagerExtractor allWagerExtractor,
+                                           WagerSummaryTransformer allWagerSummaryTransformer,
+                                           WagerSummaryLoader allWagerSummaryLoader) {
         this.extractor = allWagerExtractor;
         this.transformer = allWagerSummaryTransformer;
         this.loader = allWagerSummaryLoader;
@@ -59,8 +59,8 @@ public class AllWagerToWagerSummaryEtlProcessor extends EtlProcessor<Wager, Wage
             List<WagerSummary> wagerSummaries = transformer.transform(reducedWagers);
             futures.add(loader.load(wagerSummaries));
 
-            pageable = PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize(), pageable.getSort());
+            pageable = pageable.next();
         }
-        //CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).join();
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).join();
     }
 }
