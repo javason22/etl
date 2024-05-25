@@ -1,4 +1,4 @@
-package demo.etl.core;
+package demo.etl.core.transformer;
 
 import demo.etl.dto.SummaryDTO;
 import demo.etl.entity.output.WagerSummary;
@@ -10,7 +10,7 @@ import java.util.List;
  * Transform WagerSummaryDTO to WagerSummary
  */
 @Component
-public class SummaryDTOTransformer implements Transformer<SummaryDTO, WagerSummary>{
+public class SummaryDTOTransformer implements Transformer<SummaryDTO, WagerSummary> {
     @Override
     public List<WagerSummary> transform(List<SummaryDTO> data) {
         return data.stream().map(dto ->

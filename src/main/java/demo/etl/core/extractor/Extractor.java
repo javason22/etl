@@ -1,4 +1,4 @@
-package demo.etl.core;
+package demo.etl.core.extractor;
 
 import demo.etl.entity.InputType;
 
@@ -13,7 +13,7 @@ import java.util.List;
 public interface Extractor<T extends InputType<T>, P> {
 
     /**
-     * Extract data from a source with certain parameter
+     * Extract data from a source with specific parameter
      *
      * @param param parameter for extraction
      * @param page page number

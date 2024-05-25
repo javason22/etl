@@ -1,21 +1,18 @@
-package demo.etl.core;
+package demo.etl.core.processor;
 
+import demo.etl.core.transformer.SummaryDTOTransformer;
+import demo.etl.core.loader.WagerSummaryLoader;
+import demo.etl.core.extractor.SummaryDTOExtractor;
 import demo.etl.dto.SummaryDTO;
 import demo.etl.dto.req.EtlRequest;
 import demo.etl.entity.output.WagerSummary;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 
 @Slf4j
 @Component
-public class SummaryDTOToWagerSummaryEtlProcessor extends EtlProcessor<SummaryDTO, WagerSummary, EtlRequest>{
+public class SummaryDTOToWagerSummaryEtlProcessor extends EtlProcessor<SummaryDTO, WagerSummary, EtlRequest> {
 
     public SummaryDTOToWagerSummaryEtlProcessor(SummaryDTOExtractor summaryDTOExtractor,
                                                 SummaryDTOTransformer summaryDTOTransformer,

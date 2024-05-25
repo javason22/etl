@@ -1,7 +1,7 @@
-package demo.etl.core;
+package demo.etl.core.loader;
 
+import demo.etl.core.loader.Loader;
 import demo.etl.entity.output.WagerSummary;
-import demo.etl.repository.output.WagerSummaryRepository;
 import demo.etl.service.WagerSummaryService;
 import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Component
 @AllArgsConstructor
-public class WagerSummaryLoader implements Loader<WagerSummary>{
+public class WagerSummaryLoader implements Loader<WagerSummary> {
 
     private final WagerSummaryService wagerSummaryService;
 

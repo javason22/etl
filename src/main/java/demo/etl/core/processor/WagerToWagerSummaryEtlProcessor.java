@@ -1,24 +1,19 @@
-package demo.etl.core;
+package demo.etl.core.processor;
 
+import demo.etl.core.extractor.WagerExtractor;
+import demo.etl.core.loader.WagerSummaryLoader;
+import demo.etl.core.processor.EtlProcessor;
+import demo.etl.core.transformer.WagerSummaryTransformer;
 import demo.etl.dto.req.EtlRequest;
 import demo.etl.entity.input.Wager;
 import demo.etl.entity.output.WagerSummary;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class WagerToWagerSummaryEtlProcessor extends EtlProcessor<Wager, WagerSummary, EtlRequest>{
+public class WagerToWagerSummaryEtlProcessor extends EtlProcessor<Wager, WagerSummary, EtlRequest> {
 
     public WagerToWagerSummaryEtlProcessor(WagerExtractor allWagerExtractor,
                                            WagerSummaryTransformer allWagerSummaryTransformer,

@@ -1,15 +1,14 @@
-package demo.etl.core;
+package demo.etl.core.transformer;
 
+import demo.etl.core.transformer.Transformer;
 import demo.etl.entity.input.Wager;
 import demo.etl.entity.output.WagerSummary;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,16 +18,18 @@ import java.util.stream.Collectors;
  *
  */
 @Component
-public class WagerSummaryTransformer implements Transformer<Wager, WagerSummary>{
+public class WagerSummaryTransformer implements Transformer<Wager, WagerSummary> {
 
     @Override
     public List<WagerSummary> transform(List<Wager> data) {
-        assert data != null && !data.isEmpty();
+        List<WagerSummary> output = new ArrayList<>();
+        if(data != null && !data.isEmpty()){
+            return output; // return empty list if data is empty
+        }
         // group by accountId to a map
         Map<String, List<Wager>> wagerMap = data.stream()
                 .collect(Collectors.groupingBy(wager -> wager.getAccountId()));
         // calculate totalWagerAmount for each accountId
-        List<WagerSummary> output = new ArrayList<>();
         wagerMap.forEach((accountId, wagers) -> {
             // group by wagerDate to a map
             Map<LocalDate, List<Wager>> wagerDateMap = wagers.stream()
