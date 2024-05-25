@@ -1,6 +1,7 @@
 package demo.etl.controller;
 
 import demo.etl.entity.input.Wager;
+import demo.etl.req.WagerRequest;
 import demo.etl.resp.WagerResponse;
 import demo.etl.service.WagerService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -31,7 +33,7 @@ public class WagerController {
     private final WagerService wagerService;
 
     @Operation(summary = "List all wagers with pagination")
-    @Parameters({@Parameter(name = "example", description = "Wager example", required = true),
+    @Parameters({@Parameter(name = "request", description = "Search criteria request", required = true),
             @Parameter(name = "page", description = "Page number", required = true),
             @Parameter(name = "size", description = "Page size", required = true)})
     @ApiResponses({
@@ -40,9 +42,15 @@ public class WagerController {
                     1. code=200, success.
                     2. code=400, parameters invalid.""")})
     @GetMapping("/")
-    public ResponseEntity<Page<WagerResponse>> list(@RequestParam(required = false) Wager example, @RequestParam int page, @RequestParam int size){
-        log.debug("List wagers example={}, page={}, size={}", example, page, size);
-        Page<Wager> result = wagerService.page(example, page, size);
+    public ResponseEntity<Page<WagerResponse>> list(@ModelAttribute WagerRequest request,
+                                                    @RequestParam int page,
+                                                    @RequestParam int size){
+        log.debug("List wagers example={}, page={}, size={}", request, page, size);
+        Wager searchCriteria = new Wager();
+        if(request != null){
+            BeanUtils.copyProperties(request, searchCriteria);
+        }
+        Page<Wager> result = wagerService.page(searchCriteria, page, size);
         return ResponseEntity.ok(result.map(wager -> WagerResponse.builder()
                 .id(wager.getId())
                 .wagerAmount(wager.getWagerAmount())

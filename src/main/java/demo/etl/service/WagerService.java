@@ -25,7 +25,7 @@ public class WagerService {
 
     @Cacheable(value = "wagerList", key = "#root.methodName + '_' + #example.hashCode() + '_' + #page + '_' + #size")
     public Page<Wager> page(Wager example, int page, int size){
-        Sort sort = Sort.by(Sort.Order.asc("accountId"), Sort.Order.desc("wagerTimestamp"));
+        Sort sort = Sort.by(Sort.Order.asc("accountId"), Sort.Order.asc("wagerTimestamp"));
         return wagerRepository.findAll(Example.of(example), PageRequest.of(page, size, sort));
     }
 

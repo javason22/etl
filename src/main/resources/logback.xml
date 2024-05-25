@@ -25,21 +25,14 @@
     </appender>
 
     <springProfile name="local">
-        <root level="INFO">
+        <root level="DEBUG">
             <appender-ref ref="STDOUT" />
             <appender-ref ref="FILE" />
         </root>
     </springProfile>
 
     <springProfile name="dev">
-        <root level="INFO">
-            <appender-ref ref="STDOUT" />
-            <appender-ref ref="FILE" />
-        </root>
-    </springProfile>
-
-    <springProfile name="test">
-        <root level="INFO">
+        <root level="DEBUG">
             <appender-ref ref="STDOUT" />
             <appender-ref ref="FILE" />
         </root>

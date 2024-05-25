@@ -42,7 +42,7 @@ public class AllWagerToWagerSummaryEtlProcessor extends EtlProcessor<Wager, Wage
                 break;
             }
             if (!lastBatchWagers.isEmpty()){
-                wagers.addAll(lastBatchWagers);
+                wagers.addAll(0, lastBatchWagers);
                 lastBatchWagers.clear();
             }
             String accountId = wagers.get(wagers.size() - 1).getAccountId();
@@ -50,7 +50,7 @@ public class AllWagerToWagerSummaryEtlProcessor extends EtlProcessor<Wager, Wage
             // for grouping by account id and trimmed wagerTimestamp,
             // we need to group the last wager of the previous batch with the first wager of the current batch
             wagers.stream()
-                    .filter(wager -> wager.getAccountId().equals(accountId) || DateUtils.isSameDay(date, wager.getWagerTimestamp()))
+                    .filter(wager -> wager.getAccountId().equals(accountId) && DateUtils.isSameDay(date, wager.getWagerTimestamp()))
                     .forEach(wager ->{
                         lastBatchWagers.add(wager);
                         //wagers.remove(wager);
@@ -61,6 +61,6 @@ public class AllWagerToWagerSummaryEtlProcessor extends EtlProcessor<Wager, Wage
 
             pageable = PageRequest.of(pageable.getPageNumber() + 1, pageable.getPageSize(), pageable.getSort());
         }
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).join();
+        //CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).join();
     }
 }

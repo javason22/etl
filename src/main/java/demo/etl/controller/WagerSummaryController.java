@@ -1,6 +1,7 @@
 package demo.etl.controller;
 
 import demo.etl.entity.output.WagerSummary;
+import demo.etl.req.WagerSummaryRequest;
 import demo.etl.resp.WagerSummaryResponse;
 import demo.etl.service.WagerSummaryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -27,7 +29,7 @@ public class WagerSummaryController {
     private final WagerSummaryService wagerSummaryService;
 
     @Operation(summary = "List all wager summaries with pagination")
-    @Parameters({@Parameter(name = "example", description = "Wager summary example", required = true),
+    @Parameters({@Parameter(name = "request", description = "Search criteria request", required = true),
             @Parameter(name = "page", description = "Page number", required = true),
             @Parameter(name = "size", description = "Page size", required = true)})
     @ApiResponses({
@@ -36,8 +38,15 @@ public class WagerSummaryController {
                     1. code=200, success.
                     2. code=400, parameters invalid.""")})
     @GetMapping("/")
-    public ResponseEntity<Page<WagerSummaryResponse>> list(WagerSummary example, int page, int size){
-        Page<WagerSummary> result = wagerSummaryService.page(example, page, size);
+    public ResponseEntity<Page<WagerSummaryResponse>> list(@ModelAttribute WagerSummaryRequest request,
+                                                           @RequestParam int page,
+                                                           @RequestParam int size){
+        log.debug("List wager summaries example={}, page={}, size={}", request, page, size);
+        WagerSummary searchCriteria = new WagerSummary();
+        if(request != null){
+            BeanUtils.copyProperties(request, searchCriteria);
+        }
+        Page<WagerSummary> result = wagerSummaryService.page(searchCriteria, page, size);
         return ResponseEntity.ok(result.map(wagerSummary -> WagerSummaryResponse.builder()
                 .id(wagerSummary.getId())
                 .totalWagerAmount(wagerSummary.getTotalWagerAmount())

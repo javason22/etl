@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -16,6 +17,7 @@ public class AllWagerExtractor implements Extractor<Wager, Pageable>{
     private final WagerRepository wagerRepository;
     @Override
     public List<Wager> extract(Pageable pageable) {
-        return wagerRepository.findAll(pageable).getContent();
+        // convert unmodifiable Page to List
+        return new ArrayList<Wager>(wagerRepository.findAll(pageable).getContent());
     }
 }

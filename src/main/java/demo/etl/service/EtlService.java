@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +20,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class EtlService {
 
-    private static final int BATCH_SIZE = 10;
+    private static final int BATCH_SIZE = 5;
 
     private static final String WAGER_SUMMARY_LOCK = "wager-summary-lock";
 
@@ -60,7 +61,8 @@ public class EtlService {
             // critical section
             // clear all existing wager summaries
             wagerSummaryRepository.deleteAll();
-            allWagerToWagerSummaryEtlProcessor.process(PageRequest.of(0, BATCH_SIZE));
+            Sort sort = Sort.by(Sort.Order.asc("accountId"), Sort.Order.asc("wagerTimestamp"));
+            allWagerToWagerSummaryEtlProcessor.process(PageRequest.of(0, BATCH_SIZE, sort));
         } finally {
             lock.unlock();
             log.info("Released lock {}", WAGER_SUMMARY_LOCK);

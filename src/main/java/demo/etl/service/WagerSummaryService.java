@@ -24,7 +24,7 @@ public class WagerSummaryService {
 
     @Cacheable(value = "wagerSummaryList", key = "#root.methodName + '_' + #example.hashCode() + '_' + #page + '_' + #size")
     public Page<WagerSummary> page(WagerSummary example, int page, int size){
-        Sort sort = Sort.by(Sort.Order.asc("accountId"), Sort.Order.desc("wagerDate"));
+        Sort sort = Sort.by(Sort.Order.asc("accountId"), Sort.Order.asc("wagerDate"));
         return wagerSummaryRepository.findAll(Example.of(example), PageRequest.of(page, size, sort));
     }
 
