@@ -2,7 +2,6 @@ package demo.etl.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -15,23 +14,24 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
+import java.util.Objects;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = "demo.etl.repository.output",
-        entityManagerFactoryRef = "outputEntityManagerFactory",
-        transactionManagerRef = "outputTransactionManager")
-public class OutputJpaConfiguration {
+@EnableJpaRepositories(basePackages = "demo.etl.repository.input",
+        entityManagerFactoryRef = "inputEntityManagerFactory",
+        transactionManagerRef = "inputTransactionManager")
+public class InputJpaConfig {
 
     @Autowired
     private Environment env;
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean outputEntityManagerFactory(
-            @Qualifier("writeDataSource") DataSource dataSource) {
+    public LocalContainerEntityManagerFactoryBean inputEntityManagerFactory(
+            @Qualifier("readDataSource") DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource);
-        em.setPackagesToScan(new String[] {"demo.etl.entity.output"});
+        em.setPackagesToScan(new String[] {"demo.etl.entity.input"});
         HibernateJpaVendorAdapter vendorAdapter
                 = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
@@ -45,8 +45,8 @@ public class OutputJpaConfiguration {
     }
 
     @Bean
-    public PlatformTransactionManager outputTransactionManager(
-            @Qualifier("outputEntityManagerFactory") LocalContainerEntityManagerFactoryBean outputEntityManagerFactory) {
-        return new JpaTransactionManager(outputEntityManagerFactory.getObject());
+    public PlatformTransactionManager inputTransactionManager(
+            @Qualifier("inputEntityManagerFactory") LocalContainerEntityManagerFactoryBean inputEntityManagerFactory) {
+        return new JpaTransactionManager(Objects.requireNonNull(inputEntityManagerFactory.getObject()));
     }
 }

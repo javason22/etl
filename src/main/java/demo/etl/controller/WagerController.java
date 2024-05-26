@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -43,9 +44,9 @@ public class WagerController {
                     2. code=400, parameters invalid.""")})
     @GetMapping("/")
     public ResponseEntity<Page<WagerResponse>> list(@ModelAttribute WagerRequest request,
-                                                    @RequestParam int page,
-                                                    @RequestParam int size){
-        log.debug("List wagers example={}, page={}, size={}", request, page, size);
+                                                    @RequestParam(required = false, defaultValue = "0") int page,
+                                                    @RequestParam(required = false, defaultValue = "10") int size){
+        log.info("List wagers example={}, page={}, size={}", request, page, size);
         Wager searchCriteria = new Wager();
         if(request != null){
             BeanUtils.copyProperties(request, searchCriteria);
@@ -69,7 +70,7 @@ public class WagerController {
                     3. code=404, wager not found.""")})
     @GetMapping("/{id}")
     public ResponseEntity<WagerResponse> get(@PathVariable String id){
-        log.debug("Get wager id={}", id);
+        log.info("Get wager id={}", id);
         Wager wager = wagerService.get(id);
         if(wager == null){
             return ResponseEntity.notFound().build();
@@ -83,7 +84,7 @@ public class WagerController {
 
     @Operation(summary = "Create a new wager record by sending the full object of the wager without the unique ID.")
     @Parameters({
-            @Parameter(name = "wager", description = "Wager object", required = true)})
+            @Parameter(name = "request", description = "Wager object", required = true)})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = """
                     Create a new wager.
@@ -92,27 +93,21 @@ public class WagerController {
                     3. code=422, duplicate wager creation.
                     3. code=500, internal server error.""")})
     @PostMapping("/")
-    public ResponseEntity<WagerResponse> add(@RequestBody Wager wager){
-        log.debug("Add wager={}", wager);
-        if(wager.getId() != null){ // id should be null
-            log.error("Id value should be null for new wager.");
-            return ResponseEntity.badRequest().build();
-        }
-        try{
-            Wager createdWager = wagerService.add(wager);
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                    WagerResponse.builder()
-                            .id(createdWager.getId())
-                            .wagerAmount(createdWager.getWagerAmount())
-                            .wagerTimestamp(createdWager.getWagerTimestamp())
-                            .accountId(createdWager.getAccountId()).build());
-        } catch(DataIntegrityViolationException e){
-            log.error("Duplicate wager creation", e);
-            return ResponseEntity.unprocessableEntity().build();
-        } catch (Exception e){
-            log.error("Error adding wager", e);
-            return ResponseEntity.internalServerError().build();
-        }
+    public ResponseEntity<WagerResponse> add(@Valid @RequestBody WagerRequest request){
+        log.info("Add wager={}", request);
+        // convert request object to entity
+        Wager wager = Wager.builder()
+                .accountId(request.getAccountId())
+                .wagerAmount(request.getWagerAmount())
+                .wagerTimestamp(request.getWagerTimestamp()).build();
+        wager = wagerService.add(wager);
+        // convert entity to response object
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                WagerResponse.builder()
+                        .id(wager.getId())
+                        .wagerAmount(wager.getWagerAmount())
+                        .wagerTimestamp(wager.getWagerTimestamp())
+                        .accountId(wager.getAccountId()).build());
     }
 
     @Operation(summary = "Update wager by sending the full object of the wager with the new values and unique ID.")
@@ -127,26 +122,21 @@ public class WagerController {
                     3. code=404, wager not found.
                     3. code=500, internal server error.""")})
     @PutMapping("/{id}")
-    public ResponseEntity<WagerResponse> update(@PathVariable String id, @RequestBody WagerRequest request){
-        log.debug("Update wager={}", request);
-        try{
-            Wager wager = Wager.builder()
-                    .id(id)
-                    .accountId(request.getAccountId())
-                    .wagerAmount(request.getWagerAmount()).build();
-            Wager updatedWager = wagerService.update(wager);
-            if(updatedWager == null){
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.ok(WagerResponse.builder()
-                    .id(updatedWager.getId())
-                    .wagerAmount(updatedWager.getWagerAmount())
-                    .wagerTimestamp(updatedWager.getWagerTimestamp())
-                    .accountId(updatedWager.getAccountId()).build());
-        } catch (Exception e){
-            log.error("Error updating wager", e);
-            return ResponseEntity.internalServerError().build();
+    public ResponseEntity<WagerResponse> update(@PathVariable String id, @Valid @RequestBody WagerRequest request){
+        log.info("Update wager={}", request);
+        Wager wager = Wager.builder()
+                .id(id)
+                .accountId(request.getAccountId())
+                .wagerAmount(request.getWagerAmount()).build();
+        Wager updatedWager = wagerService.update(wager);
+        if(updatedWager == null){
+            return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.ok(WagerResponse.builder()
+                .id(updatedWager.getId())
+                .wagerAmount(updatedWager.getWagerAmount())
+                .wagerTimestamp(updatedWager.getWagerTimestamp())
+                .accountId(updatedWager.getAccountId()).build());
     }
 
     @Operation(summary = "Delete wager by giving its unique ID in the URL.")
@@ -161,16 +151,11 @@ public class WagerController {
                     4. code=500, internal server error.""")})
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id){
-        log.debug("Delete wager id={}", id);
-        try{
-            if(!wagerService.delete(id)) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.noContent().build();
-        } catch (Exception e){
-            log.error("Error deleting wager", e);
-            return ResponseEntity.internalServerError().build();
+        log.info("Delete wager id={}", id);
+        if(!wagerService.delete(id)) {
+            return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.noContent().build();
     }
 
 }

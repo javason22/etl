@@ -65,7 +65,7 @@ public class WagerService {
         return true;
     }
 
-    @Cacheable(value = "wager", key = "#id")
+    @Cacheable(value = "wager", key = "#id", condition="#result != null")
     public Wager get(String id){
         if(!wagerBloomFilter.contains(id)){
             log.info("Wager id={} not found in bloom filter", id);
