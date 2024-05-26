@@ -12,6 +12,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -44,8 +47,8 @@ public class WagerController {
                     2. code=400, parameters invalid.""")})
     @GetMapping("/")
     public ResponseEntity<Page<WagerResponse>> list(@ModelAttribute WagerRequest request,
-                                                    @RequestParam(required = false, defaultValue = "0") int page,
-                                                    @RequestParam(required = false, defaultValue = "10") int size){
+                                                    @Positive @RequestParam(required = false, defaultValue = "0") int page,
+                                                    @Positive @RequestParam(required = false, defaultValue = "10") int size){
         log.info("List wagers example={}, page={}, size={}", request, page, size);
         Wager searchCriteria = new Wager();
         if(request != null){
@@ -69,7 +72,7 @@ public class WagerController {
                     2. code=400, parameters invalid.
                     3. code=404, wager not found.""")})
     @GetMapping("/{id}")
-    public ResponseEntity<WagerResponse> get(@PathVariable String id){
+    public ResponseEntity<WagerResponse> get(@NotBlank @PathVariable String id){
         log.info("Get wager id={}", id);
         Wager wager = wagerService.get(id);
         if(wager == null){

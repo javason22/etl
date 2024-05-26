@@ -131,7 +131,7 @@ public class SummaryDTOToWagerSummaryEtlProcessorTest {
     @Test
     public void testProcessSingleBatch() {
         // Arrange
-        EtlRequest request = new EtlRequest("2024-01-01", "2024-01-05");
+        EtlRequest request = new EtlRequest("2024-01-01", "2024-01-05", false);
 
         List<SummaryDTO> input = testInputWagers.subList(0, 15);
         when(summaryDTOExtractor.extract(request, 0, 20)).thenReturn(input);
@@ -210,7 +210,7 @@ public class SummaryDTOToWagerSummaryEtlProcessorTest {
     @Test
     public void testProcessMultipleBatch() {
         // Arrange
-        EtlRequest request = new EtlRequest("2024-01-01", "2024-01-05");
+        EtlRequest request = new EtlRequest("2024-01-01", "2024-01-05", false);
 
         List<SummaryDTO> input1 = new ArrayList<>(testInputWagers.subList(0, 5));
         List<SummaryDTO> input2 = new ArrayList<>(testInputWagers.subList(5, 10));

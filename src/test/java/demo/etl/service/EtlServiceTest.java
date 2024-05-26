@@ -3,6 +3,7 @@ package demo.etl.service;
 import demo.etl.core.processor.SummaryDTOToWagerSummaryEtlProcessor;
 import demo.etl.core.processor.WagerToWagerSummaryEtlProcessor;
 import demo.etl.dto.req.EtlRequest;
+import demo.etl.entity.output.WagerSummary;
 import demo.etl.repository.output.WagerSummaryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,15 +15,12 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.*;
 
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.anyInt;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class EtlServiceTest {
@@ -55,10 +53,10 @@ public class EtlServiceTest {
     @Test
     public void testTransformWagersToWagerSummaries() throws Exception {
         // Arrange
-        EtlRequest request = new EtlRequest("2023-01-01", "2023-01-31");
+        EtlRequest request = new EtlRequest("2023-01-01", "2023-01-31", false);
 
         doNothing().when(wagerSummaryRepository).deleteByWagerDateBetween(any(LocalDate.class), any(LocalDate.class));
-        doNothing().when(wagerToWagerSummaryEtlProcessor).process(eq(request), anyInt());
+        when(wagerToWagerSummaryEtlProcessor.process(eq(request), anyInt())).thenReturn(new ArrayList<>());
 
         // Act
         etlService.transformWagersToWagerSummaries(request);
@@ -76,7 +74,7 @@ public class EtlServiceTest {
         EtlRequest request = null;
 
         doNothing().when(wagerSummaryRepository).deleteAll();
-        doNothing().when(wagerToWagerSummaryEtlProcessor).process(any(), anyInt());
+        when(wagerToWagerSummaryEtlProcessor.process(eq(request), anyInt())).thenReturn(new ArrayList<>());
 
         // Act
         etlService.transformWagersToWagerSummaries(request);
@@ -91,10 +89,10 @@ public class EtlServiceTest {
     @Test
     public void testTransformSummaryDTOToWagerSummaries() throws Exception {
         // Arrange
-        EtlRequest request = new EtlRequest("2023-01-01", "2023-01-31");
+        EtlRequest request = new EtlRequest("2023-01-01", "2023-01-31", false);
 
         doNothing().when(wagerSummaryRepository).deleteByWagerDateBetween(any(LocalDate.class), any(LocalDate.class));
-        doNothing().when(summaryDTOToWagerSummaryEtlProcessor).process(eq(request), anyInt());
+        //when(wagerToWagerSummaryEtlProcessor.process(eq(request), anyInt())).thenReturn(new ArrayList<>());
 
         // Act
         etlService.transformSummaryDTOToWagerSummaries(request);
@@ -112,7 +110,7 @@ public class EtlServiceTest {
         EtlRequest request = null;
 
         doNothing().when(wagerSummaryRepository).deleteAll();
-        doNothing().when(summaryDTOToWagerSummaryEtlProcessor).process(any(), anyInt());
+        //doReturn(new ArrayList<CompletableFuture<List<WagerSummary>>>()).when(wagerToWagerSummaryEtlProcessor).process(nullable(EtlRequest.class), anyInt());
 
         // Act
         etlService.transformSummaryDTOToWagerSummaries(request);
@@ -121,16 +119,16 @@ public class EtlServiceTest {
         verify(rLock, times(1)).lock();
         verify(rLock, times(1)).unlock();
         verify(wagerSummaryRepository, times(1)).deleteAll();
-        verify(summaryDTOToWagerSummaryEtlProcessor, times(1)).process(eq(request), anyInt());
+        verify(summaryDTOToWagerSummaryEtlProcessor).process(nullable(EtlRequest.class), anyInt());
     }
 
     @Test
     public void testConcurrentTransformWagersToWagerSummaries() throws InterruptedException, ExecutionException {
         // Arrange
-        EtlRequest request = new EtlRequest("2023-01-01", "2023-01-31");
+        EtlRequest request = new EtlRequest("2023-01-01", "2023-01-31", false);
 
         doNothing().when(wagerSummaryRepository).deleteByWagerDateBetween(any(LocalDate.class), any(LocalDate.class));
-        doNothing().when(wagerToWagerSummaryEtlProcessor).process(eq(request), anyInt());
+        when(wagerToWagerSummaryEtlProcessor.process(eq(request), anyInt())).thenReturn(new ArrayList<>());
 
         ExecutorService executorService = Executors.newFixedThreadPool(3);
         CountDownLatch latch = new CountDownLatch(3);
@@ -166,10 +164,11 @@ public class EtlServiceTest {
     @Test
     public void testConcurrentTransformSummaryDTOToWagerSummaries() throws InterruptedException, ExecutionException {
         // Arrange
-        EtlRequest request = new EtlRequest("2023-01-01", "2023-01-31");
+        EtlRequest request = new EtlRequest("2023-01-01", "2023-01-31", false);
 
         doNothing().when(wagerSummaryRepository).deleteByWagerDateBetween(any(LocalDate.class), any(LocalDate.class));
-        doNothing().when(summaryDTOToWagerSummaryEtlProcessor).process(eq(request), anyInt());
+        //doNothing().when(summaryDTOToWagerSummaryEtlProcessor).process(eq(request), anyInt());
+        //when(wagerToWagerSummaryEtlProcessor.process(eq(request), anyInt())).thenReturn(new ArrayList<>());
 
         ExecutorService executorService = Executors.newFixedThreadPool(3);
         CountDownLatch latch = new CountDownLatch(3);

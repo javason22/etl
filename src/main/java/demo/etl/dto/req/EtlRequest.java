@@ -13,4 +13,6 @@ public class EtlRequest {
     private String startDate;
     @Schema(description = "End date", example = "2021-01-31")
     private String endDate;
+    @Schema(description = "Immediate return after triggering ETL process", example = "true")
+    private Boolean immediateReturn;
 }

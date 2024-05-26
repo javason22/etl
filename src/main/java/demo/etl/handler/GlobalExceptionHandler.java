@@ -1,6 +1,7 @@
 package demo.etl.handler;
 
 import demo.etl.dto.resp.GeneralResponse;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,6 +20,13 @@ public class GlobalExceptionHandler {
         GeneralResponse response = new GeneralResponse(HttpStatus.INTERNAL_SERVER_ERROR.toString(),
                 "Something went wrong");
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<GeneralResponse> handleDataIntegrityViolationExceptions(Exception e, WebRequest request){
+        GeneralResponse response = new GeneralResponse(HttpStatus.UNPROCESSABLE_ENTITY.toString(),
+                "Duplicate item found");
+        return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

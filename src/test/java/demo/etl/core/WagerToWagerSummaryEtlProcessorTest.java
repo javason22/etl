@@ -128,7 +128,7 @@ public class WagerToWagerSummaryEtlProcessorTest {
     @Test
     public void testProcessSingleBatch() {
         // Arrange
-        EtlRequest request = new EtlRequest("2024-01-01", "2024-01-05");
+        EtlRequest request = new EtlRequest("2024-01-01", "2024-01-05", false);
 
         // custom matchers to verify the pageable of 3 pages extraction
         //ArgumentMatcher<Pageable> firstPageMatcher = pageable -> pageable.getPageNumber() == 0 && pageable.getPageSize() == 5;
@@ -182,7 +182,7 @@ public class WagerToWagerSummaryEtlProcessorTest {
     @Test
     public void testProcessNormalFinalBatch() {
         // Arrange
-        EtlRequest request = new EtlRequest("2024-01-01", "2024-01-05");
+        EtlRequest request = new EtlRequest("2024-01-01", "2024-01-05", false);
 
         // custom matchers to verify the pageable of 3 pages extraction
         //ArgumentMatcher<Pageable> firstPageMatcher = pageable -> pageable.getPageNumber() == 0 && pageable.getPageSize() == 5;
@@ -248,7 +248,7 @@ public class WagerToWagerSummaryEtlProcessorTest {
     @Test
     public void testProcessFullFinalBatch() {
         // Arrange
-        EtlRequest request = new EtlRequest("2024-01-01", "2024-01-05");
+        EtlRequest request = new EtlRequest("2024-01-01", "2024-01-05", false);
 
         // custom matchers to verify the pageable of 3 pages extraction
         //ArgumentMatcher<Pageable> firstPageMatcher = pageable -> pageable.getPageNumber() == 0 && pageable.getPageSize() == 5;

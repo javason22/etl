@@ -3,6 +3,7 @@ package demo.etl.service;
 import demo.etl.core.processor.WagerToWagerSummaryEtlProcessor;
 import demo.etl.core.processor.SummaryDTOToWagerSummaryEtlProcessor;
 import demo.etl.dto.req.EtlRequest;
+import demo.etl.entity.output.WagerSummary;
 import demo.etl.repository.output.WagerSummaryRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
@@ -32,10 +35,13 @@ public class EtlService {
 
 
     //@Transactional(transactionManager = "outputTransactionManager")
-    public void transformWagersToWagerSummaries(EtlRequest request) {
+    public List<WagerSummary> transformWagersToWagerSummaries(EtlRequest request) {
         log.info("Transforming all wagers to wager summaries");
 
         RLock lock = redissonClient.getLock(WAGER_SUMMARY_LOCK);
+        // if request is null, immediateReturn is true
+        Boolean immediateReturn = request == null ? true : request.getImmediateReturn();
+        List<CompletableFuture<List<WagerSummary>>> futures = null;
         try {
             lock.lock();
             log.info("Acquired lock {}", WAGER_SUMMARY_LOCK);
@@ -48,18 +54,37 @@ public class EtlService {
                         LocalDate.parse(request.getStartDate()),
                         LocalDate.parse(request.getEndDate()));
             }
-            wagerToWagerSummaryEtlProcessor.process(request, BATCH_SIZE);
+            futures = wagerToWagerSummaryEtlProcessor.process(request, BATCH_SIZE);
+            if(!immediateReturn && futures != null){
+                log.info("Waiting for all futures to complete");
+                CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+                List<CompletableFuture<List<WagerSummary>>> finalFutures = futures;
+                CompletableFuture<List<WagerSummary>> allResultsFuture = allFutures.thenApply(v -> finalFutures.stream()
+                        .map(CompletableFuture::join)
+                        .flatMap(List::stream)
+                        .toList());
+                return allResultsFuture.join();
+            }
+            // return null if immediateReturn is true
+            return null;
         } finally {
+            // release the lock only when all futures are completed
+            if(immediateReturn && futures != null) {
+                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+            }
             lock.unlock();
             log.info("Released lock {}", WAGER_SUMMARY_LOCK);
         }
     }
 
     //@Transactional(transactionManager = "outputTransactionManager")
-    public void transformSummaryDTOToWagerSummaries(EtlRequest request){
+    public List<WagerSummary> transformSummaryDTOToWagerSummaries(EtlRequest request){
         log.info("Transforming summary DTOs to wager summaries");
 
         RLock lock = redissonClient.getLock(WAGER_SUMMARY_LOCK);
+        // if request is null, immediateReturn is true
+        Boolean immediateReturn = request == null ? true : request.getImmediateReturn();
+        List<CompletableFuture<List<WagerSummary>>> futures = null;
         try {
             lock.lock();
             log.info("Acquired lock {}", WAGER_SUMMARY_LOCK);
@@ -72,8 +97,24 @@ public class EtlService {
                         LocalDate.parse(request.getStartDate()),
                         LocalDate.parse(request.getEndDate()));
             }
-            summaryDTOToWagerSummaryEtlProcessor.process(request, BATCH_SIZE);
+            futures = summaryDTOToWagerSummaryEtlProcessor.process(request, BATCH_SIZE);
+            if(!immediateReturn && futures != null){
+                log.info("Waiting for all futures to complete");
+                CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+                List<CompletableFuture<List<WagerSummary>>> finalFutures = futures;
+                CompletableFuture<List<WagerSummary>> allResultsFuture = allFutures.thenApply(v -> finalFutures.stream()
+                        .map(CompletableFuture::join)
+                        .flatMap(List::stream)
+                        .toList());
+                return allResultsFuture.join();
+            }
+            // return null if immediateReturn is true
+            return null;
         } finally {
+            // release the lock only when all futures are completed
+            if(immediateReturn && futures != null) {
+                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+            }
             lock.unlock();
             log.info("Released lock {}", WAGER_SUMMARY_LOCK);
         }

@@ -34,8 +34,10 @@ public class EtlProcessor<E extends InputType<E>, L, P> {
      *
      * @param param parameter for extraction in the extractor
      * @param batchSize size of batch to process
+     *
+     * @return List of CompletableFuture of the loaded data
      */
-    public void process(P param, int batchSize){
+    public List<CompletableFuture<List<L>>> process(P param, int batchSize){
         log.info("Start processing");
         int batchCount = 0;
         boolean isFinalBatch = false;
@@ -45,13 +47,6 @@ public class EtlProcessor<E extends InputType<E>, L, P> {
             List<E> sourceData = extractor.extract(param, batchCount, batchSize);
             // final batch data checking
             if (sourceData.isEmpty() || sourceData.size() < batchSize) { // if no more wagers to process
-                /*if(!lastBatchData.isEmpty()){ // if there are remaining wagers in the last batch waiting to be processed
-                    //List<L> transformedData = transformer.transform(lastBatchData);
-                    //futures.add(loader.load(transformedData));
-                    // add the last batch remaining data to the beginning of current batch
-                    sourceData.addAll(0, lastBatchData);
-                    lastBatchData.clear(); // clear the last batch data
-                }*/
                 isFinalBatch = true;
             }
             if (!lastBatchData.isEmpty()){ // if there are remaining wagers in the last batch waiting to be processed
@@ -64,11 +59,6 @@ public class EtlProcessor<E extends InputType<E>, L, P> {
                 // pop out the last data of same grouping in the batch
                 E lastSourceData = sourceData.get(sourceData.size() - 1);
                 // remove the data with same group as last data in the batch
-                /*sourceData.stream()
-                        .filter(data -> data.sameGroupToTransform(lastSourceData))
-                        .forEach(wager -> {
-                            lastBatchData.add(wager);
-                        });*/
                 List<E> toAddToLastBatchData = sourceData.stream()
                         .filter(data -> data.sameGroupToTransform(lastSourceData))
                         .collect(Collectors.toList());
@@ -81,8 +71,8 @@ public class EtlProcessor<E extends InputType<E>, L, P> {
             batchCount++;
             log.info("Processed batch: {} size of batch {}", batchCount, sourceData.size());
         }
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).join();
         log.info("End processing");
+        return futures;
     }
 
 }

@@ -24,5 +24,4 @@ public class WagerSummaryLoader implements Loader<WagerSummary> {
         return CompletableFuture.completedFuture(result);
     }
 
-
 }
