@@ -15,12 +15,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -38,7 +36,7 @@ public class WagerToWagerSummaryEtlProcessorTest {
     @Mock
     private WagerSummaryLoader wagerSummaryLoader;
 
-    private WagerToWagerSummaryEtlProcessor allWagerToWagerSummaryEtlProcessor;
+    private WagerToWagerSummaryEtlProcessor wagerToWagerSummaryEtlProcessor;
 
     @Captor
     private ArgumentCaptor<List<WagerSummary>> wagerSummaryCaptor;
@@ -48,7 +46,7 @@ public class WagerToWagerSummaryEtlProcessorTest {
     @BeforeEach
     @SneakyThrows
     public void setUp() {
-        allWagerToWagerSummaryEtlProcessor = new WagerToWagerSummaryEtlProcessor(allWagerExtractor, new WagerSummaryTransformer(), wagerSummaryLoader);
+        wagerToWagerSummaryEtlProcessor = new WagerToWagerSummaryEtlProcessor(allWagerExtractor, new WagerSummaryTransformer(), wagerSummaryLoader);
         testInputWagers = new ArrayList<>();
         testInputWagers.add(Wager.builder()
                 .accountId("00001")
@@ -144,7 +142,7 @@ public class WagerToWagerSummaryEtlProcessorTest {
         when(wagerSummaryLoader.load(any())).thenReturn(CompletableFuture.completedFuture(new ArrayList<>()));
 
         // Act
-        allWagerToWagerSummaryEtlProcessor.process(request, 20);
+        wagerToWagerSummaryEtlProcessor.process(request, 20);
 
         // Assert
         verify(wagerSummaryLoader).load(wagerSummaryCaptor.capture());
@@ -191,18 +189,18 @@ public class WagerToWagerSummaryEtlProcessorTest {
         //ArgumentMatcher<Pageable> secondPageMatcher = pageable -> pageable.getPageNumber() == 1 && pageable.getPageSize() == 5;
         //ArgumentMatcher<Pageable> thirdPageMatcher = pageable -> pageable.getPageNumber() == 2 && pageable.getPageSize() == 5;
 
-        List<Wager> wagers1Loop = testInputWagers.subList(0, 5);
-        List<Wager> wagers2Loop = testInputWagers.subList(5, 10);
-        List<Wager> wagers3Loop = testInputWagers.subList(10, 12);
+        List<Wager> wagers1Loop = new ArrayList<>(testInputWagers.subList(0, 5));
+        List<Wager> wagers2Loop = new ArrayList<>(testInputWagers.subList(5, 10));
+        List<Wager> wagers3Loop = new ArrayList<>(testInputWagers.subList(10, 12));
 
-        doReturn(wagers1Loop).when(allWagerExtractor).extract(request, 0, 5);
-        doReturn(wagers2Loop).when(allWagerExtractor).extract(request, 1, 5);
-        doReturn(wagers3Loop).when(allWagerExtractor).extract(request, 2, 5);
+        when((allWagerExtractor).extract(request, 0, 5)).thenReturn(wagers1Loop);
+        when((allWagerExtractor).extract(request, 1, 5)).thenReturn(wagers2Loop);
+        when((allWagerExtractor).extract(request, 2, 5)).thenReturn(wagers3Loop);
 
         when(wagerSummaryLoader.load(any())).thenReturn(CompletableFuture.completedFuture(new ArrayList<>()));
 
         // Act
-        allWagerToWagerSummaryEtlProcessor.process(request, 5);
+        wagerToWagerSummaryEtlProcessor.process(request, 5);
 
         // Assert
         verify(wagerSummaryLoader, times(3)).load(wagerSummaryCaptor.capture());
@@ -257,9 +255,9 @@ public class WagerToWagerSummaryEtlProcessorTest {
         //ArgumentMatcher<Pageable> secondPageMatcher = pageable -> pageable.getPageNumber() == 1 && pageable.getPageSize() == 5;
         //ArgumentMatcher<Pageable> thirdPageMatcher = pageable -> pageable.getPageNumber() == 2 && pageable.getPageSize() == 5;
 
-        List<Wager> wagers1Loop = testInputWagers.subList(0, 5);
-        List<Wager> wagers2Loop = testInputWagers.subList(5, 10);
-        List<Wager> wagers3Loop = testInputWagers.subList(10, 15);
+        List<Wager> wagers1Loop = new ArrayList<>(testInputWagers.subList(0, 5));
+        List<Wager> wagers2Loop = new ArrayList<>(testInputWagers.subList(5, 10));
+        List<Wager> wagers3Loop = new ArrayList<>(testInputWagers.subList(10, 15));
 
         doReturn(wagers1Loop).when(allWagerExtractor).extract(request, 0, 5);
         doReturn(wagers2Loop).when(allWagerExtractor).extract(request, 1, 5);
@@ -268,7 +266,7 @@ public class WagerToWagerSummaryEtlProcessorTest {
         when(wagerSummaryLoader.load(any())).thenReturn(CompletableFuture.completedFuture(new ArrayList<>()));
 
         // Act
-        allWagerToWagerSummaryEtlProcessor.process(request, 5);
+        wagerToWagerSummaryEtlProcessor.process(request, 5);
 
         // Assert
         verify(wagerSummaryLoader, times(4)).load(wagerSummaryCaptor.capture());

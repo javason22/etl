@@ -67,6 +67,10 @@ public class WagerSummaryController {
     @PostMapping("/")
     public ResponseEntity<WagerSummaryResponse> add(@RequestBody WagerSummary wagerSummary){
         log.info("Add wager summary={}", wagerSummary);
+        if(wagerSummary.getId() != null){ // id should be null
+            log.error("Add wager summary failed, id should be null");
+            return ResponseEntity.badRequest().build();
+        }
         try{
             wagerSummary = wagerSummaryService.add(wagerSummary);
             return ResponseEntity.status(HttpStatus.CREATED).body(WagerSummaryResponse.builder()

@@ -16,7 +16,8 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "WAGER", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"ACCOUNT_ID", "WAGER_TIMESTAMP"})
+        @UniqueConstraint(name = "unique_wager_account_id_timestamp",
+                columnNames = {"ACCOUNT_ID", "WAGER_TIMESTAMP"})
 })
 @Builder
 public class Wager implements Serializable, InputType<Wager>{

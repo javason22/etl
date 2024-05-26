@@ -13,7 +13,8 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "WAGER_SUMMARY",
         uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"ACCOUNT_ID", "WAGER_DATE"})
+        @UniqueConstraint(name = "unique_wager_summary_account_id_wager_date",
+                columnNames = {"ACCOUNT_ID", "WAGER_DATE"})
 })
 @Builder
 public class WagerSummary implements Serializable {

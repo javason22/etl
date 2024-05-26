@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class EtlResponse {
+public class GeneralResponse {
 
     private String status;
     private String message;

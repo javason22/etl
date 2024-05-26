@@ -1,5 +1,6 @@
 package demo.etl.controller;
 
+import demo.etl.dto.resp.GeneralResponse;
 import demo.etl.entity.input.Wager;
 import demo.etl.dto.req.WagerRequest;
 import demo.etl.dto.resp.WagerResponse;
@@ -93,6 +94,10 @@ public class WagerController {
     @PostMapping("/")
     public ResponseEntity<WagerResponse> add(@RequestBody Wager wager){
         log.debug("Add wager={}", wager);
+        if(wager.getId() != null){ // id should be null
+            log.error("Id value should be null for new wager.");
+            return ResponseEntity.badRequest().build();
+        }
         try{
             Wager createdWager = wagerService.add(wager);
             return ResponseEntity.status(HttpStatus.CREATED).body(

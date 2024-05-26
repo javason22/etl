@@ -2,6 +2,7 @@ package demo.etl.dto;
 
 import demo.etl.entity.InputType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Tolerate;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
  */
 @Slf4j
 @Data
+@Builder
 @AllArgsConstructor
 public class SummaryDTO implements InputType<SummaryDTO> {
     private String accountId;

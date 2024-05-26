@@ -28,12 +28,12 @@ public class WagerExtractor implements Extractor<Wager, EtlRequest> {
         Pageable pageable = PageRequest.of(page, size, sort);
         // if request is null, return all wagers with pagination
         if(request == null){
-            return new ArrayList<Wager>(wagerRepository.findAll(PageRequest.of(page, size)).getContent());
+            return new ArrayList<>(wagerRepository.findAll(PageRequest.of(page, size)).getContent());
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDateTime start = LocalDate.parse(request.getStartDate(), formatter).atStartOfDay();
         LocalDateTime end = LocalDate.parse(request.getEndDate(), formatter).atTime(23, 59, 59, 999999999);
         // convert unmodifiable Page to List
-        return new ArrayList<Wager>(wagerRepository.findByWagerTimestampBetween(start, end, pageable).getContent());
+        return new ArrayList<>(wagerRepository.findByWagerTimestampBetween(start, end, pageable).getContent());
     }
 }

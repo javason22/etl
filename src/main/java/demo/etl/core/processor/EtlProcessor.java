@@ -64,11 +64,15 @@ public class EtlProcessor<E extends InputType<E>, L, P> {
                 // pop out the last data of same grouping in the batch
                 E lastSourceData = sourceData.get(sourceData.size() - 1);
                 // remove the data with same group as last data in the batch
-                sourceData.stream()
+                /*sourceData.stream()
                         .filter(data -> data.sameGroupToTransform(lastSourceData))
                         .forEach(wager -> {
                             lastBatchData.add(wager);
-                        });
+                        });*/
+                List<E> toAddToLastBatchData = sourceData.stream()
+                        .filter(data -> data.sameGroupToTransform(lastSourceData))
+                        .collect(Collectors.toList());
+                lastBatchData.addAll(toAddToLastBatchData);
                 dataForProcess = sourceData.stream().filter(data -> !lastBatchData.contains(data)).collect(Collectors.toList());
             }
             List<L> wagerSummaries = transformer.transform(dataForProcess);

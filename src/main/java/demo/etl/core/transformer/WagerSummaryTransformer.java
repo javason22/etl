@@ -23,7 +23,7 @@ public class WagerSummaryTransformer implements Transformer<Wager, WagerSummary>
     @Override
     public List<WagerSummary> transform(List<Wager> data) {
         List<WagerSummary> output = new ArrayList<>();
-        if(data != null && !data.isEmpty()){
+        if(data == null || data.isEmpty()){
             return output; // return empty list if data is empty
         }
         // group by accountId to a map
