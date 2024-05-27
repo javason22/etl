@@ -177,7 +177,7 @@ curl -X POST "http://localhost:8080/api/v1/wager/" -H "Content-Type: application
 ```
 #### Get list of wagers with pagination
 ```bash
-# CURL command with selection criteria
+# CURL command with selection criteria accountId and wagerAmount
 curl -X GET "http://localhost:8080/api/v1/wager/?page=0&size=10&accountId=00001&wagerAmount=100.01" -H "X-User-ID: jason"
 # CURL command without selection criteria
 curl -X GET "http://localhost:8080/api/v1/wager/?page=0&size=10" -H "X-User-ID: jason"
@@ -200,7 +200,7 @@ curl -X DELETE "http://localhost:8080/api/v1/wager/{id}" -H "X-User-ID: jason"
 ### Wager Summary APIs' CURL Commands
 #### Get list of wager summaries with pagination
 ```bash
-# CURL command with selection criteria
+# CURL command with selection criteria accountId, totalWagerAmount, and wagerDate
 curl -X GET "http://localhost:8080/api/v1/wager-summary/?page=0&size=10&accountId=0001&totalWagerAmount=100.00&wagerDate=2022-01-01" -H "X-User-ID: jason"
 # CURL command without selection criteria
 curl -X GET "http://localhost:8080/api/v1/wager-summary/?page=0&size=10" -H "X-User-ID: jason"
@@ -228,15 +228,21 @@ curl -X DELETE "http://localhost:8080/api/v1/wager-summary/{id}" -H "X-User-ID: 
 #### Trigger ETL transformation (Version 1)
 ```bash
 # CURL command with paramters
+# if immediateReturn is true, the API will return immediately after the ETL transformation is triggered
+# if immediateReturn is false, the API will return after the ETL transformation is completed. A list of wager summaries will be returned in the response.
 curl -X POST "http://localhost:8080/api/v1/etl/trigger" -H "Content-Type: application/json" -H "X-User-ID: jason" -d "{\"startDate\":\"2022-01-01\",\"endDate\":\"2022-01-31\",\"immediateReturn\":true}"
 # CURL command without paramters
+# All wagers will be extracted in this case. The immediateReturn is set to true by default.
 curl -X POST "http://localhost:8080/api/v1/etl/trigger" -H "X-User-ID: jason"
 ```
 #### Trigger ETL transformation (Version 2)
 ```bash
 # CURL command with paramters
+# if immediateReturn is true, the API will return immediately after the ETL transformation is triggered
+# if immediateReturn is false, the API will return after the ETL transformation is completed. A list of wager summaries will be returned in the response.
 curl -X POST "http://localhost:8080/api/v2/etl/trigger" -H "Content-Type: application/json" -H "X-User-ID: jason" -d "{\"startDate\":\"2022-01-01\",\"endDate\":\"2022-01-31\",\"immediateReturn\":true}"
-# CURL command without paramters
+# CURL command without paramters. 
+# All wagers will be extracted in this case. The immediateReturn is set to true by default.
 curl -X POST "http://localhost:8080/api/v2/etl/trigger" -H "X-User-ID: jason"
 ```
 ## Reference Documentation
