@@ -77,7 +77,7 @@ Configure the MySQL connection properties for the source and destination databas
 app:
   datasource:
     input:
-      url: jdbc:mysql://localhost:3307/database_read
+      url: jdbc:mysql://localhost:3306/database_read
       username: [user_name] # Input MySQL DB's username
       password: [password] # Input MySQL DB's password
     output:
@@ -86,7 +86,8 @@ app:
       password: [password] # Output MySQL DB's password
 ```
 #### Spring and Redis Configuration
-The application uses Spring Data JPA to interact with the MySQL databases and Redisson to interact with the Redis server. Configure the Spring and Redis connection properties in the application.yml file located in the src/main/resources directory.
+The application uses Spring Data JPA to interact with the MySQL databases and Redisson to interact with the Redis server. 
+Configure the Spring and Redis connection properties in the application.yml file located in the src/main/resources directory.
 ```yaml
 spring:
   application:
@@ -95,9 +96,9 @@ spring:
     active: dev
   data:
     redis:
-      host: [redis address]
-      port: [redis port]
-      database: [redis database name]
+      host: [redis address] # Redis server address
+      port: [redis port] # Redis server port
+      database: [redis database name] # Redis database name
   jpa:
     hibernate:
       ddl-auto: update
@@ -107,10 +108,10 @@ spring:
         format_sql: true
         use_sql_comments: true
         jdbc:
-          time_zone: UTC-7
+          time_zone: UTC-7 # Set your own time zone so that the time objects passed in API are consistent with the MySQL database
 ```
 #### Turnoff ONLY_FULL_GROUP_BY in source MySQL
-The application's v2 ETL transformation uses the GROUP BY clause in the SQL query to summarize the wager amounts by account and day. To avoid the error "Expression #1 of SELECT list is not in GROUP BY clause and contains nonaggregated column", turn off the ONLY_FULL_GROUP_BY mode in the source MySQL database.
+The application's v2 ETL transformation uses the GROUP BY clause in the SQL query to summarize the wager amounts by account and day. To avoid the error _"Expression #1 of SELECT list is not in GROUP BY clause and contains nonaggregated column"_, turn off the ONLY_FULL_GROUP_BY mode in the source MySQL database.
 - SQL command to turn off the ONLY_FULL_GROUP_BY mode:
 ```sql
 SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
@@ -123,19 +124,21 @@ SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
 git clone https://github.com/javason22/etl.git
 ```
 
-2. Navigate to the project directory
+2. Change the configuration in the application.yml file if necessary (check the Application Configuration section
+
+3. Navigate to the project directory
 ```bash
-cd /etl
+cd ./etl
 ```
 
-3. Build the project
+4. Build the project
 ```bash
 mvn clean package
 ```
 
-4. Run the application
+5. Run the application
 ```bash
-cd target
+cd ./target
 java -jar etl-0.0.1-SNAPSHOT.jar
 ```
 After starting the application, the Spring Boot application will be running on http://localhost:8080
