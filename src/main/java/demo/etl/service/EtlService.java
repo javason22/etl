@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 
@@ -35,6 +37,10 @@ public class EtlService {
 
 
     //@Transactional(transactionManager = "outputTransactionManager", isolation = Isolation.SERIALIZABLE)
+    @Caching(evict = {
+            @CacheEvict(value = "wagerSummary", allEntries = true),
+            @CacheEvict(value = "wagerSummaryList", allEntries = true)
+    })
     public List<WagerSummary> transformWagersToWagerSummaries(EtlRequest request) {
         log.info("Transforming all wagers to wager summaries");
 
@@ -80,6 +86,10 @@ public class EtlService {
     }
 
     //@Transactional(transactionManager = "outputTransactionManager", isolation = Isolation.SERIALIZABLE)
+    @Caching(evict = {
+            @CacheEvict(value = "wagerSummary", allEntries = true),
+            @CacheEvict(value = "wagerSummaryList", allEntries = true)
+    })
     public List<WagerSummary> transformSummaryDTOToWagerSummaries(EtlRequest request){
         log.info("Transforming summary DTOs to wager summaries");
 
