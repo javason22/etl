@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/etl")
 @Slf4j
-@Tag(name = "ETL", description = "Version 1 APIs for ETL transformation. Trigger ETL transform for daily wagers to wager summaries.")
+@Tag(name = "ETL", description = "Version 1 APIs for ETL transformation. Trigger ETL transformation for daily wagers to wager summaries.")
 public class EtlV1Controller {
 
     private final EtlService etlService;

@@ -23,12 +23,12 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v2/etl")
 @AllArgsConstructor
-@Tag(name = "ETL", description = "Version 2 APIs for ETL transformation. Trigger ETL transform for daily wagers to wager summaries.")
+@Tag(name = "ETL", description = "APIs for ETL transformation triggering. Trigger ETL transform for daily wagers to wager summaries.")
 public class EtlV2Controller {
 
     private final EtlService etlService;
 
-    @Operation(summary = "Trigger ETL transform for all wagers to wager summaries")
+    @Operation(summary = "Trigger V2 ETL transform for all wagers to wager summaries. It delegates the calculation of total wager amount to MySQL database.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = """
                     Trigger ETL transform for all wagers to wager summaries.

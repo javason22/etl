@@ -17,21 +17,21 @@ It also provides API to trigger the ETL transformation, which counts the total w
 
 ## Features
 
-- A simple generic Extractor-Transformer-Loader design for high code usability and extensibility 
+- A simple generic Extractor-Transformer-Loader design for high code re-usable and extensible 
 - Standard RESTful APIs CRUD operations for wagers and wager summaries
-- Pagination for wagers and wager summaries
+- Pagination for wagers and wager summaries with query criteria
 - Trigger ETL transformation to summarize the wager amounts by account and day
 - Two versions of ETL transformation
   - Version 1: Summarize the wager amounts by account and day in Java code
   - Version 2: Summarize the wager amounts by account and day in MySQL using GROUP BY clause
 - API documentation using Swagger
-- Redis caching for CRUD operations
-- Bloom filter for minimizing the number of database queries
-- Concurrent asynchronous processing for ETL transformation
-- Redis distributed lock for ETL transformation to guarantee only one ETL transformation is running at a time
+- Redis caching for CRUD results for fast entities retrieval
+- Bloom filter to prevent invalid and non-exist ID searching in database queries
+- Concurrent asynchronous processing to increase the performance of ETL transformation
+- Redis distributed lock for ETL transformation to guarantee only ETL transformation is atomic operation
 - Spring Data JPA for interacting with MySQL databases
 - Redisson for interacting with Redis server
-- Spring Validation for validating the APIs' request
+- Spring Validation for validating APIs' request
 - Mockito for unit testing
 
 ## Installation
@@ -119,7 +119,7 @@ After starting the application, the Spring Boot application will be running on h
 With ddl-auto attribute in application.yml set to 'update', the necessary tables will be created in the source and destination databases automatically.
 
 5. Access the application
-- Use CURL or Postman to access the APIs in http://localhost:8080/api/v1/wagers/ and http://localhost:8080/api/v1/wagers-summary/
+- Use CURL or Postman to access the APIs in http://localhost:8080/api/v1/wager/ and http://localhost:8080/api/v1/wager-summary/
 - Open a web browser and navigate API documentation in http://localhost:8080/swagger-ui.html
 
 ## Usage
