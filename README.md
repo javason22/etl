@@ -115,6 +115,7 @@ The application's v2 ETL transformation uses the GROUP BY clause in the SQL quer
 - SQL command to turn off the ONLY_FULL_GROUP_BY mode:
 ```sql
 SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+SET PERSIST sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
 ```
 
 ### Steps to run the ETL application
