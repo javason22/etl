@@ -21,7 +21,7 @@ import java.util.concurrent.CompletableFuture;
 @AllArgsConstructor
 public class EtlService {
 
-    private static final int BATCH_SIZE = 5;
+    private static final int BATCH_SIZE = 2000;
 
     private static final String WAGER_SUMMARY_LOCK = "wager-summary-lock";
 
@@ -54,6 +54,7 @@ public class EtlService {
                         LocalDate.parse(request.getStartDate()),
                         LocalDate.parse(request.getEndDate()));
                 wagerSummaryRepository.deleteAll(wagerSummaries);
+                wagerSummaryRepository.flush();
             }
             futures = wagerToWagerSummaryEtlProcessor.process(request, BATCH_SIZE);
             if(!immediateReturn && futures != null){
@@ -93,6 +94,7 @@ public class EtlService {
             // clear all existing wager summaries
             if(request == null) {
                 wagerSummaryRepository.deleteAll();
+                wagerSummaryRepository.flush();
             } else {
                 List<WagerSummary> wagerSummaries = wagerSummaryRepository.findByWagerDateBetween(
                         LocalDate.parse(request.getStartDate()),
