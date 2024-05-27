@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Tolerate;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 @Builder
 public class WagerSummary implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 2359006129L;
 
     @Id

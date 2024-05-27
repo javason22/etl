@@ -152,25 +152,29 @@ public class WagerToWagerSummaryEtlProcessorTest {
 
         for(WagerSummary wagerSummary : capturedWagerSummaries) {
             log.debug("WagerSummary: {}", wagerSummary);
-            if(wagerSummary.getAccountId().equals("00001")) {
-                if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
-                    assertEquals(new BigDecimal("300.02"), wagerSummary.getTotalWagerAmount());
-                } else if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 2))) {
-                    assertEquals(new BigDecimal("100.02"), wagerSummary.getTotalWagerAmount());
+            switch (wagerSummary.getAccountId()) {
+                case "00001" -> {
+                    if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
+                        assertEquals(new BigDecimal("300.02"), wagerSummary.getTotalWagerAmount());
+                    } else if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 2))) {
+                        assertEquals(new BigDecimal("100.02"), wagerSummary.getTotalWagerAmount());
+                    }
                 }
-            } else if(wagerSummary.getAccountId().equals("00002")) {
-                if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
-                    assertEquals(new BigDecimal("700.02"), wagerSummary.getTotalWagerAmount());
-                } else if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 2))) {
-                    assertEquals(new BigDecimal("1000.03"), wagerSummary.getTotalWagerAmount());
+                case "00002" -> {
+                    if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
+                        assertEquals(new BigDecimal("700.02"), wagerSummary.getTotalWagerAmount());
+                    } else if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 2))) {
+                        assertEquals(new BigDecimal("1000.03"), wagerSummary.getTotalWagerAmount());
+                    }
                 }
-            } else if(wagerSummary.getAccountId().equals("00003")) {
-                if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
-                    assertEquals(new BigDecimal("1100.02"), wagerSummary.getTotalWagerAmount());
-                } else if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 3))) {
-                    assertEquals(new BigDecimal("700.02"), wagerSummary.getTotalWagerAmount());
-                } else if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 4))) {
-                    assertEquals(new BigDecimal("500.02"), wagerSummary.getTotalWagerAmount());
+                case "00003" -> {
+                    if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
+                        assertEquals(new BigDecimal("1100.02"), wagerSummary.getTotalWagerAmount());
+                    } else if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 3))) {
+                        assertEquals(new BigDecimal("700.02"), wagerSummary.getTotalWagerAmount());
+                    } else if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 4))) {
+                        assertEquals(new BigDecimal("500.02"), wagerSummary.getTotalWagerAmount());
+                    }
                 }
             }
 
@@ -213,23 +217,27 @@ public class WagerToWagerSummaryEtlProcessorTest {
         for(List<WagerSummary> wagerSummaries : capturedWagerSummaries) {
             for(WagerSummary wagerSummary : wagerSummaries) {
                 log.debug("WagerSummary: {}", wagerSummary);
-                if(wagerSummary.getAccountId().equals("00001")) {
-                    if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
-                        assertEquals(new BigDecimal("300.02"), wagerSummary.getTotalWagerAmount());
-                    } else if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 2))) {
-                        assertEquals(new BigDecimal("100.02"), wagerSummary.getTotalWagerAmount());
+                switch (wagerSummary.getAccountId()) {
+                    case "00001" -> {
+                        if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
+                            assertEquals(new BigDecimal("300.02"), wagerSummary.getTotalWagerAmount());
+                        } else if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 2))) {
+                            assertEquals(new BigDecimal("100.02"), wagerSummary.getTotalWagerAmount());
+                        }
                     }
-                } else if(wagerSummary.getAccountId().equals("00002")) {
-                    if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
-                        assertEquals(new BigDecimal("700.02"), wagerSummary.getTotalWagerAmount());
-                    } else if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 2))) {
-                        assertEquals(new BigDecimal("1000.03"), wagerSummary.getTotalWagerAmount());
+                    case "00002" -> {
+                        if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
+                            assertEquals(new BigDecimal("700.02"), wagerSummary.getTotalWagerAmount());
+                        } else if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 2))) {
+                            assertEquals(new BigDecimal("1000.03"), wagerSummary.getTotalWagerAmount());
+                        }
                     }
-                } else if(wagerSummary.getAccountId().equals("00003")) {
-                    if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
-                        assertEquals(new BigDecimal("1100.02"), wagerSummary.getTotalWagerAmount());
-                    } else if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 3))) {
-                        assertEquals(new BigDecimal("600.01"), wagerSummary.getTotalWagerAmount());
+                    case "00003" -> {
+                        if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
+                            assertEquals(new BigDecimal("1100.02"), wagerSummary.getTotalWagerAmount());
+                        } else if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 3))) {
+                            assertEquals(new BigDecimal("600.01"), wagerSummary.getTotalWagerAmount());
+                        }
                     }
                 }
             }
@@ -280,25 +288,29 @@ public class WagerToWagerSummaryEtlProcessorTest {
         for(List<WagerSummary> wagerSummaries : capturedWagerSummaries) {
             for(WagerSummary wagerSummary : wagerSummaries) {
                 log.debug("WagerSummary: {}", wagerSummary);
-                if(wagerSummary.getAccountId().equals("00001")) {
-                    if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
-                        assertEquals(new BigDecimal("300.02"), wagerSummary.getTotalWagerAmount());
-                    } else if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 2))) {
-                        assertEquals(new BigDecimal("100.02"), wagerSummary.getTotalWagerAmount());
+                switch (wagerSummary.getAccountId()) {
+                    case "00001" -> {
+                        if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
+                            assertEquals(new BigDecimal("300.02"), wagerSummary.getTotalWagerAmount());
+                        } else if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 2))) {
+                            assertEquals(new BigDecimal("100.02"), wagerSummary.getTotalWagerAmount());
+                        }
                     }
-                } else if(wagerSummary.getAccountId().equals("00002")) {
-                    if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
-                        assertEquals(new BigDecimal("700.02"), wagerSummary.getTotalWagerAmount());
-                    } else if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 2))) {
-                        assertEquals(new BigDecimal("1000.03"), wagerSummary.getTotalWagerAmount());
+                    case "00002" -> {
+                        if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
+                            assertEquals(new BigDecimal("700.02"), wagerSummary.getTotalWagerAmount());
+                        } else if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 2))) {
+                            assertEquals(new BigDecimal("1000.03"), wagerSummary.getTotalWagerAmount());
+                        }
                     }
-                } else if(wagerSummary.getAccountId().equals("00003")) {
-                    if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
-                        assertEquals(new BigDecimal("1100.02"), wagerSummary.getTotalWagerAmount());
-                    } else if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 3))) {
-                        assertEquals(new BigDecimal("700.02"), wagerSummary.getTotalWagerAmount());
-                    } else if(wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 4))) {
-                        assertEquals(new BigDecimal("500.02"), wagerSummary.getTotalWagerAmount());
+                    case "00003" -> {
+                        if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 1))) {
+                            assertEquals(new BigDecimal("1100.02"), wagerSummary.getTotalWagerAmount());
+                        } else if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 3))) {
+                            assertEquals(new BigDecimal("700.02"), wagerSummary.getTotalWagerAmount());
+                        } else if (wagerSummary.getWagerDate().isEqual(LocalDate.of(2024, 1, 4))) {
+                            assertEquals(new BigDecimal("500.02"), wagerSummary.getTotalWagerAmount());
+                        }
                     }
                 }
             }

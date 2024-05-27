@@ -16,7 +16,7 @@ public interface Loader<T> {
      * The subclass should annotate @Async to implement the logic
      * to load the data and return the result as a CompletableFuture.
      *
-     * @param data
+     * @param data data to be loaded
      * @return CompletableFuture of the loaded data
      */
     CompletableFuture<List<T>> load(List<T> data);

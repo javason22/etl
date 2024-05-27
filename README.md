@@ -5,7 +5,6 @@
    <img src="https://img.shields.io/badge/Redisson-3.30.0-red.svg" alt="Coverage Status">
    <img src="https://img.shields.io/badge/Spring%20Boot-3.2.5-blue.svg" alt="Downloads">
    <img src="https://img.shields.io/badge/Author-Jason%20Wong-ff69b4.svg" alt="Downloads">
-   <img src="https://img.shields.io/badge/Copyright%20-@javason22-%23ff3f59.svg" alt="Downloads">
  </a>
 </p>  
 
@@ -15,6 +14,25 @@
 
 This ETL (Extract, Transform, Load) application was developed using Java, Spring Boot, and Maven. It provides APIs for managing CRUD of wagers from the source database and wager summaries from the destination database.
 It also provides API to trigger the ETL transformation, which counts the total wager amounts of each account in each day and writes the summary to the destination database.
+
+## Features
+
+- A simple generic Extractor-Transformer-Loader design for high code usability and extensibility 
+- Standard RESTful APIs CRUD operations for wagers and wager summaries
+- Pagination for wagers and wager summaries
+- Trigger ETL transformation to summarize the wager amounts by account and day
+- Two versions of ETL transformation
+  - Version 1: Summarize the wager amounts by account and day in Java code
+  - Version 2: Summarize the wager amounts by account and day in MySQL using GROUP BY clause
+- API documentation using Swagger
+- Redis caching for CRUD operations
+- Bloom filter for minimizing the number of database queries
+- Concurrent asynchronous processing for ETL transformation
+- Redis distributed lock for ETL transformation to guarantee only one ETL transformation is running at a time
+- Spring Data JPA for interacting with MySQL databases
+- Redisson for interacting with Redis server
+- Spring Validation for validating the APIs' request
+- Mockito for unit testing
 
 ## Installation
 
@@ -37,12 +55,12 @@ app:
   datasource:
     input:
       url: jdbc:mysql://localhost:3307/database_read
-      username: root
-      password: 123456
+      username: [user_name] # Input MySQL DB's username
+      password: [password] # Input MySQL DB's password
     output:
       url: jdbc:mysql://localhost:3307/database_write
-      username: root
-      password: 123456
+      username: [user_name] # Output MySQL DB's username
+      password: [password] # Output MySQL DB's password
 ```
 #### Spring and Redis Configuration
 The application uses Spring Data JPA to interact with the MySQL databases and Redisson to interact with the Redis server. Configure the Spring and Redis connection properties in the application.yml file located in the src/main/resources directory.
@@ -120,11 +138,11 @@ The application provides the following endpoints:
 - PUT /api/v1/wager/{id} - Update a wager summary in destination database by id
 - DELETE /api/v1/wager/{id} - Delete a wager summary from destination database by id
 ### ETL API
-- POST /api/v1/etl/trigger - Trigger the ETL transformation to summarize the wager amounts by account and day (version 1)
-- POST /api/v2/etl/trigger - Trigger the ETL transformation to summarize the wager amounts by account and day (version 2)
+- POST /api/v1/etl/trigger - Trigger the ETL transformation to summarize the wager amounts by account and day (version 1). Version 1 summarize the wager amounts by account and day in Java code.
+- POST /api/v2/etl/trigger - Trigger the ETL transformation to summarize the wager amounts by account and day (version 2). Version 2 delegates the sum of wager amount to MySQL. It uses GROUP BY clause in the SQL query to summarize the wager amounts by account and day.
 
 ## Swagger API Documentation
-The API documentation was constructed by Swagger framework. After started up the ETL application, the API documentation is available at http://localhost:8080/swagger-ui.html
+The detailed API documentation was constructed by Swagger framework. After started up the ETL application, the API documentation is available at http://localhost:8080/swagger-ui.html
 
 ## CURL Commands
 
@@ -135,7 +153,7 @@ curl -X POST "http://localhost:8080/api/v1/wager/" -H "Content-Type: application
 ```
 #### Get list of wagers with pagination
 ```bash
-curl -X GET "http://localhost:8080/api/v1/wager/?page=0&size=10" -H "X-User-ID: jason"
+curl -X GET "http://localhost:8080/api/v1/wager/?page=0&size=10&accountId=00001&wagerAmount=100.01" -H "X-User-ID: jason"
 ```
 #### Get a wager by id
 ```bash
@@ -152,7 +170,7 @@ curl -X DELETE "http://localhost:8080/api/v1/wager/{id}" -H "X-User-ID: jason"
 ### Wager Summary APIs' CURL Commands
 #### Get list of wager summaries with pagination
 ```bash
-curl -X GET "http://localhost:8080/api/v1/wager-summary/?page=0&size=10&accountId=0001&totalWagerAmount=100.00&wagerTime=2022-01-01" -H "X-User-ID: jason"
+curl -X GET "http://localhost:8080/api/v1/wager-summary/?page=0&size=10&accountId=0001&totalWagerAmount=100.00&wagerDate=2022-01-01" -H "X-User-ID: jason"
 ```
 #### Get a wager summary by id
 ```bash
@@ -173,9 +191,9 @@ curl -X DELETE "http://localhost:8080/api/v1/wager-summary/{id}" -H "X-User-ID: 
 ### ETL APIs' CURL Commands
 #### Trigger ETL transformation (Version 1)
 ```bash
-curl -X POST "http://localhost:8080/api/v1/etl/trigger" -H "X-User-ID: jason"
+curl -X POST "http://localhost:8080/api/v1/etl/trigger" -H "Content-Type: application/json" -H "X-User-ID: jason" -d "{\"startDate\":\"2022-01-01\",\"endDate\":\"2022-01-31\",\"immediateReturn\":true}"
 ```
 #### Trigger ETL transformation (Version 2)
 ```bash
-curl -X POST "http://localhost:8080/api/v2/etl/trigger" -H "X-User-ID: jason"
+curl -X POST "http://localhost:8080/api/v2/etl/trigger" -H "Content-Type: application/json" -H "X-User-ID: jason" -d "{\"startDate\":\"2022-01-01\",\"endDate\":\"2022-01-31\",\"immediateReturn\":true}"
 ```

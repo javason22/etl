@@ -15,7 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import javax.cache.annotation.CacheRemove;
 import java.util.List;
 
 @Service
@@ -64,7 +63,7 @@ public class WagerSummaryService {
             log.info("Wager summary id={} not found in bloom filter", id);
             return false;
         }
-        if(!wagerSummaryRepository.findById(id).isPresent()) {
+        if(wagerSummaryRepository.findById(id).isEmpty()) {
             return false;
         }
         wagerSummaryRepository.deleteById(id);

@@ -1,6 +1,5 @@
 package demo.etl.core.extractor;
 
-import demo.etl.core.extractor.Extractor;
 import demo.etl.dto.SummaryDTO;
 import demo.etl.dto.req.EtlRequest;
 import demo.etl.repository.input.WagerRepository;

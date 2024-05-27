@@ -9,6 +9,7 @@ import lombok.experimental.Tolerate;
 import org.apache.commons.lang3.time.DateUtils;
 
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -22,6 +23,7 @@ import java.util.Date;
 @Builder
 public class Wager implements Serializable, InputType<Wager>{
 
+    @Serial
     private static final long serialVersionUID = 163905306L;
 
     @Id

@@ -3,7 +3,6 @@ package demo.etl.controller;
 import demo.etl.dto.req.EtlRequest;
 import demo.etl.dto.resp.EtlResponse;
 import demo.etl.dto.resp.GeneralResponse;
-import demo.etl.dto.resp.WagerResponse;
 import demo.etl.dto.resp.WagerSummaryResponse;
 import demo.etl.entity.output.WagerSummary;
 import demo.etl.service.EtlService;

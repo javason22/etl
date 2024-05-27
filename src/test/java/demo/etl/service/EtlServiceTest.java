@@ -3,7 +3,6 @@ package demo.etl.service;
 import demo.etl.core.processor.SummaryDTOToWagerSummaryEtlProcessor;
 import demo.etl.core.processor.WagerToWagerSummaryEtlProcessor;
 import demo.etl.dto.req.EtlRequest;
-import demo.etl.entity.output.WagerSummary;
 import demo.etl.repository.output.WagerSummaryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -51,11 +49,11 @@ public class EtlServiceTest {
     }
 
     @Test
-    public void testTransformWagersToWagerSummaries() throws Exception {
+    public void testTransformWagersToWagerSummaries() {
         // Arrange
         EtlRequest request = new EtlRequest("2023-01-01", "2023-01-31", false);
 
-        doNothing().when(wagerSummaryRepository).deleteByWagerDateBetween(any(LocalDate.class), any(LocalDate.class));
+        doNothing().when(wagerSummaryRepository).deleteAll(any());
         when(wagerToWagerSummaryEtlProcessor.process(eq(request), anyInt())).thenReturn(new ArrayList<>());
 
         // Act
@@ -64,12 +62,12 @@ public class EtlServiceTest {
         // Assert
         verify(rLock, times(1)).lock();
         verify(rLock, times(1)).unlock();
-        verify(wagerSummaryRepository, times(1)).deleteByWagerDateBetween(LocalDate.parse("2023-01-01"), LocalDate.parse("2023-01-31"));
+        verify(wagerSummaryRepository, times(1)).deleteAll(any());
         verify(wagerToWagerSummaryEtlProcessor, times(1)).process(eq(request), anyInt());
     }
 
     @Test
-    public void testTransformWagersToWagerSummariesNullRequest() throws Exception {
+    public void testTransformWagersToWagerSummariesNullRequest() {
         // Arrange
         EtlRequest request = null;
 
@@ -87,11 +85,11 @@ public class EtlServiceTest {
     }
 
     @Test
-    public void testTransformSummaryDTOToWagerSummaries() throws Exception {
+    public void testTransformSummaryDTOToWagerSummaries() {
         // Arrange
         EtlRequest request = new EtlRequest("2023-01-01", "2023-01-31", false);
 
-        doNothing().when(wagerSummaryRepository).deleteByWagerDateBetween(any(LocalDate.class), any(LocalDate.class));
+        doNothing().when(wagerSummaryRepository).deleteAll(any(List.class));
         //when(wagerToWagerSummaryEtlProcessor.process(eq(request), anyInt())).thenReturn(new ArrayList<>());
 
         // Act
@@ -100,12 +98,12 @@ public class EtlServiceTest {
         // Assert
         verify(rLock, times(1)).lock();
         verify(rLock, times(1)).unlock();
-        verify(wagerSummaryRepository, times(1)).deleteByWagerDateBetween(LocalDate.parse("2023-01-01"), LocalDate.parse("2023-01-31"));
+        verify(wagerSummaryRepository, times(1)).deleteAll(any(List.class));
         verify(summaryDTOToWagerSummaryEtlProcessor, times(1)).process(eq(request), anyInt());
     }
 
     @Test
-    public void testTransformSummaryDTOToWagerSummariesNullRequest() throws Exception {
+    public void testTransformSummaryDTOToWagerSummariesNullRequest() {
         // Arrange
         EtlRequest request = null;
 
@@ -127,7 +125,7 @@ public class EtlServiceTest {
         // Arrange
         EtlRequest request = new EtlRequest("2023-01-01", "2023-01-31", false);
 
-        doNothing().when(wagerSummaryRepository).deleteByWagerDateBetween(any(LocalDate.class), any(LocalDate.class));
+        doNothing().when(wagerSummaryRepository).deleteAll(any(List.class));
         when(wagerToWagerSummaryEtlProcessor.process(eq(request), anyInt())).thenReturn(new ArrayList<>());
 
         ExecutorService executorService = Executors.newFixedThreadPool(3);
@@ -155,7 +153,7 @@ public class EtlServiceTest {
         // Assert
         verify(rLock, times(3)).lock();
         verify(rLock, times(3)).unlock();
-        verify(wagerSummaryRepository, times(3)).deleteByWagerDateBetween(LocalDate.parse("2023-01-01"), LocalDate.parse("2023-01-31"));
+        verify(wagerSummaryRepository, times(3)).deleteAll(any(List.class));
         verify(wagerToWagerSummaryEtlProcessor, times(3)).process(eq(request), anyInt());
 
         executorService.shutdown();
@@ -166,7 +164,7 @@ public class EtlServiceTest {
         // Arrange
         EtlRequest request = new EtlRequest("2023-01-01", "2023-01-31", false);
 
-        doNothing().when(wagerSummaryRepository).deleteByWagerDateBetween(any(LocalDate.class), any(LocalDate.class));
+        doNothing().when(wagerSummaryRepository).deleteAll(any(List.class));
         //doNothing().when(summaryDTOToWagerSummaryEtlProcessor).process(eq(request), anyInt());
         //when(wagerToWagerSummaryEtlProcessor.process(eq(request), anyInt())).thenReturn(new ArrayList<>());
 
@@ -195,7 +193,7 @@ public class EtlServiceTest {
         // Assert
         verify(rLock, times(3)).lock();
         verify(rLock, times(3)).unlock();
-        verify(wagerSummaryRepository, times(3)).deleteByWagerDateBetween(LocalDate.parse("2023-01-01"), LocalDate.parse("2023-01-31"));
+        verify(wagerSummaryRepository, times(3)).deleteAll(any(List.class));
         verify(summaryDTOToWagerSummaryEtlProcessor, times(3)).process(eq(request), anyInt());
 
         executorService.shutdown();

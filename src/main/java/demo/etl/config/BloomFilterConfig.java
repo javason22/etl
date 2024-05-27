@@ -16,10 +16,10 @@ public class BloomFilterConfig {
      * Only for testing.
      * To align bloomFilter with database records.
      *
-     * @param redissonClient
-     * @param wagerRepository
-     * @param wagerSummaryRepository
-     * @return
+     * @param redissonClient redisson client bean
+     * @param wagerRepository wager repository bean
+     * @param wagerSummaryRepository wager summary repository bean
+     * @return application runner
      */
     @Bean
     public ApplicationRunner bloomFilterInitializer(RedissonClient redissonClient,

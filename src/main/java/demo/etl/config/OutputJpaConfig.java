@@ -1,6 +1,6 @@
 package demo.etl.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +22,7 @@ import java.util.HashMap;
         transactionManagerRef = "outputTransactionManager")
 public class OutputJpaConfig {
 
-    @Autowired
+    @Resource
     private Environment env;
 
     @Bean

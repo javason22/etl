@@ -1,6 +1,5 @@
 package demo.etl.core.transformer;
 
-import demo.etl.core.transformer.Transformer;
 import demo.etl.entity.input.Wager;
 import demo.etl.entity.output.WagerSummary;
 import org.springframework.stereotype.Component;
@@ -28,7 +27,7 @@ public class WagerSummaryTransformer implements Transformer<Wager, WagerSummary>
         }
         // group by accountId to a map
         Map<String, List<Wager>> wagerMap = data.stream()
-                .collect(Collectors.groupingBy(wager -> wager.getAccountId()));
+                .collect(Collectors.groupingBy(Wager::getAccountId));
         // calculate totalWagerAmount for each accountId
         wagerMap.forEach((accountId, wagers) -> {
             // group by wagerDate to a map
@@ -46,7 +45,7 @@ public class WagerSummaryTransformer implements Transformer<Wager, WagerSummary>
                                 .wagerDate(entry.getKey())
                                 .build();
                     })
-                    .collect(Collectors.toList());
+                    .toList();
             output.addAll(wagerSummaries);
         });
         return output;

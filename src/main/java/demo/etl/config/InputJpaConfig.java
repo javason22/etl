@@ -1,6 +1,6 @@
 package demo.etl.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +23,7 @@ import java.util.Objects;
         transactionManagerRef = "inputTransactionManager")
 public class InputJpaConfig {
 
-    @Autowired
+    @Resource
     private Environment env;
 
     @Bean
@@ -31,7 +31,7 @@ public class InputJpaConfig {
             @Qualifier("readDataSource") DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource);
-        em.setPackagesToScan(new String[] {"demo.etl.entity.input"});
+        em.setPackagesToScan("demo.etl.entity.input");
         HibernateJpaVendorAdapter vendorAdapter
                 = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);

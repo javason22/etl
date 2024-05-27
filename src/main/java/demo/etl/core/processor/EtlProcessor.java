@@ -61,7 +61,7 @@ public class EtlProcessor<E extends InputType<E>, L, P> {
                 // remove the data with same group as last data in the batch
                 List<E> toAddToLastBatchData = sourceData.stream()
                         .filter(data -> data.sameGroupToTransform(lastSourceData))
-                        .collect(Collectors.toList());
+                        .toList();
                 lastBatchData.addAll(toAddToLastBatchData);
                 dataForProcess = sourceData.stream().filter(data -> !lastBatchData.contains(data)).collect(Collectors.toList());
             }

@@ -34,13 +34,13 @@ public class EtlService {
     private final WagerSummaryRepository wagerSummaryRepository;
 
 
-    //@Transactional(transactionManager = "outputTransactionManager")
+    //@Transactional(transactionManager = "outputTransactionManager", isolation = Isolation.SERIALIZABLE)
     public List<WagerSummary> transformWagersToWagerSummaries(EtlRequest request) {
         log.info("Transforming all wagers to wager summaries");
 
         RLock lock = redissonClient.getLock(WAGER_SUMMARY_LOCK);
         // if request is null, immediateReturn is true
-        Boolean immediateReturn = request == null ? true : request.getImmediateReturn();
+        boolean immediateReturn = request == null || request.getImmediateReturn();
         List<CompletableFuture<List<WagerSummary>>> futures = null;
         try {
             lock.lock();
@@ -50,9 +50,10 @@ public class EtlService {
             if(request == null) {
                 wagerSummaryRepository.deleteAll();
             }else{
-                wagerSummaryRepository.deleteByWagerDateBetween(
+                List<WagerSummary> wagerSummaries = wagerSummaryRepository.findByWagerDateBetween(
                         LocalDate.parse(request.getStartDate()),
                         LocalDate.parse(request.getEndDate()));
+                wagerSummaryRepository.deleteAll(wagerSummaries);
             }
             futures = wagerToWagerSummaryEtlProcessor.process(request, BATCH_SIZE);
             if(!immediateReturn && futures != null){
@@ -77,13 +78,13 @@ public class EtlService {
         }
     }
 
-    //@Transactional(transactionManager = "outputTransactionManager")
+    //@Transactional(transactionManager = "outputTransactionManager", isolation = Isolation.SERIALIZABLE)
     public List<WagerSummary> transformSummaryDTOToWagerSummaries(EtlRequest request){
         log.info("Transforming summary DTOs to wager summaries");
 
         RLock lock = redissonClient.getLock(WAGER_SUMMARY_LOCK);
         // if request is null, immediateReturn is true
-        Boolean immediateReturn = request == null ? true : request.getImmediateReturn();
+        Boolean immediateReturn = request == null || request.getImmediateReturn();
         List<CompletableFuture<List<WagerSummary>>> futures = null;
         try {
             lock.lock();
@@ -93,9 +94,10 @@ public class EtlService {
             if(request == null) {
                 wagerSummaryRepository.deleteAll();
             } else {
-                wagerSummaryRepository.deleteByWagerDateBetween(
+                List<WagerSummary> wagerSummaries = wagerSummaryRepository.findByWagerDateBetween(
                         LocalDate.parse(request.getStartDate()),
                         LocalDate.parse(request.getEndDate()));
+                wagerSummaryRepository.deleteAll(wagerSummaries);
             }
             futures = summaryDTOToWagerSummaryEtlProcessor.process(request, BATCH_SIZE);
             if(!immediateReturn && futures != null){

@@ -1,6 +1,5 @@
 package demo.etl.core.loader;
 
-import demo.etl.core.loader.Loader;
 import demo.etl.entity.output.WagerSummary;
 import demo.etl.service.WagerSummaryService;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package demo.etl.validator;
+package demo.etl.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

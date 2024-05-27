@@ -2,7 +2,6 @@ package demo.etl.core.processor;
 
 import demo.etl.core.extractor.WagerExtractor;
 import demo.etl.core.loader.WagerSummaryLoader;
-import demo.etl.core.processor.EtlProcessor;
 import demo.etl.core.transformer.WagerSummaryTransformer;
 import demo.etl.dto.req.EtlRequest;
 import demo.etl.entity.input.Wager;
