@@ -8,6 +8,7 @@ import org.redisson.api.RBloomFilter;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,8 +41,10 @@ public class WagerService {
         return result;
     }
 
-    @CachePut(value = "wager", key = "#wager.id", unless = "#result == null")
-    @CacheEvict(value = "wagerList", allEntries = true, condition = "#result != null")
+    @Caching(
+            evict = {@CacheEvict(value = "wagerList", allEntries = true, condition = "#result != null")},
+            put = {@CachePut(value = "wager", key = "#wager.id", unless = "#result == null")
+    })
     public Wager update(Wager wager){
         // check if the wager id exists in bloom filter
         if(!wagerBloomFilter.contains(wager.getId())){
@@ -51,7 +54,10 @@ public class WagerService {
         return wagerRepository.save(wager);
     }
 
-    @CacheEvict(value = "wagerList", allEntries = true, condition = "#result")
+    @Caching(evict = {
+            @CacheEvict(value = "wager", key = "#id", condition = "#result"),
+            @CacheEvict(value = "wagerList", allEntries = true, condition = "#result")
+    })
     public boolean delete(String id){
         // check if the wager id exists in bloom filter
         if(!wagerBloomFilter.contains(id)){

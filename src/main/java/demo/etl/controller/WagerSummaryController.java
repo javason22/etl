@@ -1,9 +1,11 @@
 package demo.etl.controller;
 
+import demo.etl.dto.resp.GeneralResponse;
 import demo.etl.entity.output.WagerSummary;
 import demo.etl.dto.req.WagerSummaryRequest;
 import demo.etl.dto.resp.WagerSummaryResponse;
 import demo.etl.service.WagerSummaryService;
+import demo.etl.validator.ValidUUID;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -17,10 +19,13 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.text.MessageFormat;
 
 @Slf4j
 @RestController
@@ -42,8 +47,8 @@ public class WagerSummaryController {
                     2. code=400, parameters invalid.""")})
     @GetMapping("/")
     public ResponseEntity<Page<WagerSummaryResponse>> list(@ModelAttribute WagerSummaryRequest request,
-                                                           @Positive @RequestParam(required = false, defaultValue = "0") int page,
-                                                           @Positive @RequestParam(required = false, defaultValue = "10") int size){
+                                                           @RequestParam(required = false, defaultValue = "0") int page,
+                                                           @RequestParam(required = false, defaultValue = "10") int size){
         log.info("List wager summaries example={}, page={}, size={}", request, page, size);
         WagerSummary searchCriteria = new WagerSummary();
         if(request != null){
@@ -96,7 +101,7 @@ public class WagerSummaryController {
                     3. code=404, wager summary not found.
                     4. code=500, internal server error.""")})
     @PutMapping("/{id}")
-    public ResponseEntity<WagerSummaryResponse> update(@PathVariable String id, @Valid @RequestBody WagerSummaryRequest request){
+    public ResponseEntity<WagerSummaryResponse> update(@ValidUUID @PathVariable String id, @Valid @RequestBody WagerSummaryRequest request){
         log.info("Update wager summary={}", request);
         WagerSummary wagerSummary = WagerSummary.builder()
                 .id(id)
@@ -105,7 +110,8 @@ public class WagerSummaryController {
                 .wagerDate(request.getWagerDate()).build();
         wagerSummary = wagerSummaryService.update(wagerSummary);
         if(wagerSummary == null){
-            return ResponseEntity.notFound().build();
+            //return ResponseEntity.notFound().build();
+            throw new DataRetrievalFailureException("Wager summary not found");
         }
         return ResponseEntity.ok(WagerSummaryResponse.builder()
                 .id(wagerSummary.getId())
@@ -120,17 +126,18 @@ public class WagerSummaryController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = """
                     Delete wager summary.
-                    1. code=204, delete wager summary successfully.
+                    1. code=200, delete wager summary successfully.
                     2. code=400, parameters invalid.
                     3. code=404, wager summary not found.
                     4. code=500, internal server error.""")})
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id){
+    public ResponseEntity<GeneralResponse> delete(@ValidUUID @PathVariable String id){
         log.info("Delete wager summary id={}", id);
         if(!wagerSummaryService.delete(id)) {
-            return ResponseEntity.notFound().build();
+            //return ResponseEntity.notFound().build();
+            throw new DataRetrievalFailureException("Wager summary not found");
         }
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new GeneralResponse("success", MessageFormat.format("Delete wager summary {0} successfully", id)));
     }
 
     @Operation(summary = "Get wager summary")
@@ -143,11 +150,12 @@ public class WagerSummaryController {
                     2. code=400, parameters invalid.
                     3. code=404, wager summary not found.""")})
     @GetMapping("/{id}")
-    public ResponseEntity<WagerSummaryResponse> get(@NotBlank @PathVariable String id){
+    public ResponseEntity<WagerSummaryResponse> get(@ValidUUID @PathVariable String id){
         log.info("Get wager summary id={}", id);
         WagerSummary wagerSummary = wagerSummaryService.get(id);
         if(wagerSummary == null){
-            return ResponseEntity.notFound().build();
+            //return ResponseEntity.notFound().build();
+            throw new DataRetrievalFailureException("Wager summary not found");
         }
         return ResponseEntity.ok(WagerSummaryResponse.builder()
                 .id(wagerSummary.getId())

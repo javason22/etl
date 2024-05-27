@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -26,5 +27,6 @@ public class WagerRequest {
 
     @Schema(description = "Wager timestamp")
     @NotNull(message = "Wager Timestamp is mandatory")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date wagerTimestamp;
 }

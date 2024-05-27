@@ -8,12 +8,14 @@ import org.redisson.api.RBloomFilter;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.cache.annotation.CacheRemove;
 import java.util.List;
 
 @Service
@@ -39,8 +41,10 @@ public class WagerSummaryService {
         return result;
     }
 
-    @CachePut(value = "wagerSummary", key = "#wagerSummary.id", unless = "#result == null")
-    @CacheEvict(value = "wagerSummaryList", allEntries = true, condition = "#result != null")
+    @Caching(
+            evict = {@CacheEvict(value = "wagerSummaryList", allEntries = true, condition = "#result != null")},
+            put = {@CachePut(value = "wagerSummary", key = "#wagerSummary.id", unless = "#result == null")
+    })
     public WagerSummary update(WagerSummary wagerSummary){
         // check if the wager summary id exists in bloom filter
         if(!wagerSummaryBloomFilter.contains(wagerSummary.getId())){
@@ -50,7 +54,10 @@ public class WagerSummaryService {
         return wagerSummaryRepository.save(wagerSummary);
     }
 
-    @CacheEvict(value = "wagerSummaryList", allEntries = true, condition = "#result")
+    @Caching(evict = {
+            @CacheEvict(value = "wagerSummary", key = "#id", condition = "#result"),
+            @CacheEvict(value = "wagerSummaryList", allEntries = true, condition = "#result")
+    })
     public boolean delete(String id){
         // check if the wager summary id exists in bloom filter
         if(!wagerSummaryBloomFilter.contains(id)){

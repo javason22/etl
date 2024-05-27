@@ -5,6 +5,7 @@ import demo.etl.entity.input.Wager;
 import demo.etl.dto.req.WagerRequest;
 import demo.etl.dto.resp.WagerResponse;
 import demo.etl.service.WagerService;
+import demo.etl.validator.ValidUUID;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -19,10 +20,13 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.text.MessageFormat;
 
 /**
  * Wager controller
@@ -47,8 +51,8 @@ public class WagerController {
                     2. code=400, parameters invalid.""")})
     @GetMapping("/")
     public ResponseEntity<Page<WagerResponse>> list(@ModelAttribute WagerRequest request,
-                                                    @Positive @RequestParam(required = false, defaultValue = "0") int page,
-                                                    @Positive @RequestParam(required = false, defaultValue = "10") int size){
+                                                    @RequestParam(required = false, defaultValue = "0") int page,
+                                                    @RequestParam(required = false, defaultValue = "10") int size){
         log.info("List wagers example={}, page={}, size={}", request, page, size);
         Wager searchCriteria = new Wager();
         if(request != null){
@@ -72,11 +76,12 @@ public class WagerController {
                     2. code=400, parameters invalid.
                     3. code=404, wager not found.""")})
     @GetMapping("/{id}")
-    public ResponseEntity<WagerResponse> get(@NotBlank @PathVariable String id){
+    public ResponseEntity<WagerResponse> get(@ValidUUID @PathVariable String id){
         log.info("Get wager id={}", id);
         Wager wager = wagerService.get(id);
         if(wager == null){
-            return ResponseEntity.notFound().build();
+            //return ResponseEntity.notFound().build();
+            throw new DataRetrievalFailureException("Wager not found");
         }
         return ResponseEntity.ok(WagerResponse.builder()
                 .id(wager.getId())
@@ -125,15 +130,17 @@ public class WagerController {
                     3. code=404, wager not found.
                     3. code=500, internal server error.""")})
     @PutMapping("/{id}")
-    public ResponseEntity<WagerResponse> update(@PathVariable String id, @Valid @RequestBody WagerRequest request){
+    public ResponseEntity<WagerResponse> update(@ValidUUID @PathVariable String id, @Valid @RequestBody WagerRequest request){
         log.info("Update wager={}", request);
         Wager wager = Wager.builder()
                 .id(id)
                 .accountId(request.getAccountId())
-                .wagerAmount(request.getWagerAmount()).build();
+                .wagerAmount(request.getWagerAmount())
+                .wagerTimestamp(request.getWagerTimestamp()).build();
         Wager updatedWager = wagerService.update(wager);
         if(updatedWager == null){
-            return ResponseEntity.notFound().build();
+            //return ResponseEntity.notFound().build();
+            throw new DataRetrievalFailureException("Wager not found");
         }
         return ResponseEntity.ok(WagerResponse.builder()
                 .id(updatedWager.getId())
@@ -148,17 +155,18 @@ public class WagerController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = """
                     Delete wager.
-                    1. code=204, Delete wager successfully. No content returned.
+                    1. code=200, Delete wager successfully. No content returned.
                     2. code=400, parameters invalid.
                     3. code=404, wager not found.
                     4. code=500, internal server error.""")})
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id){
+    public ResponseEntity<GeneralResponse> delete(@ValidUUID @PathVariable String id){
         log.info("Delete wager id={}", id);
         if(!wagerService.delete(id)) {
-            return ResponseEntity.notFound().build();
+            //return ResponseEntity.notFound().build();
+            throw new DataRetrievalFailureException("Wager not found");
         }
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new GeneralResponse("success", MessageFormat.format("Delete wager summary {0} successfully", id)));
     }
 
 }

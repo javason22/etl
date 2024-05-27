@@ -108,17 +108,17 @@ With ddl-auto attribute in application.yml set to 'update', the necessary tables
 The application provides the following endpoints:  
 
 ### Wager API
-- GET /api/v1/wagers/ - Get list of wager from source database with pagination
-- GET /api/v1/wagers/{id} - Get a wager from source database by id
-- POST /api/v1/wagers/ - Create a new wager into source database
-- PUT /api/v1/wagers/{id} - Update a wager in source database by id
-- DELETE /api/v1/wagers/{id} - Delete a wager from source database by id
+- GET /api/v1/wager/ - Get list of wager from source database with pagination
+- GET /api/v1/wager/{id} - Get a wager from source database by id
+- POST /api/v1/wager/ - Create a new wager into source database
+- PUT /api/v1/wager/{id} - Update a wager in source database by id
+- DELETE /api/v1/wager/{id} - Delete a wager from source database by id
 ### Wager Summary API
-- GET /api/v1/wagers-summary/ - Get list of wager summaries from destination database with pagination
-- GET /api/v1/wagers/{id} - Get a wager summary from destination database by id
-- POST /api/v1/wagers/ - Create a new wager into destination database summary
-- PUT /api/v1/wagers/{id} - Update a wager summary in destination database by id
-- DELETE /api/v1/wagers/{id} - Delete a wager summary from destination database by id
+- GET /api/v1/wager-summary/ - Get list of wager summaries from destination database with pagination
+- GET /api/v1/wager/{id} - Get a wager summary from destination database by id
+- POST /api/v1/wager/ - Create a new wager into destination database summary
+- PUT /api/v1/wager/{id} - Update a wager summary in destination database by id
+- DELETE /api/v1/wager/{id} - Delete a wager summary from destination database by id
 ### ETL API
 - POST /api/v1/etl/trigger - Trigger the ETL transformation to summarize the wager amounts by account and day (version 1)
 - POST /api/v2/etl/trigger - Trigger the ETL transformation to summarize the wager amounts by account and day (version 2)
@@ -127,13 +127,11 @@ The application provides the following endpoints:
 The API documentation was constructed by Swagger framework. After started up the ETL application, the API documentation is available at http://localhost:8080/swagger-ui.html
 
 ## CURL Commands
-<details>
- <summary><code>List of CURL Commands to call the ETL APIs</code></summary>
 
 ### Wager APIs' CURL Commands
 #### Create a new wager
 ```bash
-curl -X POST "http://localhost:8080/api/v1/wager/" -H "Content-Type: application/json" -H "X-User-ID: jason" -d "{\"accountId\":\"00001\",\"wagerAmount\":100.01,\"wagerTimestamp\":\"2022-01-01T00:00:00\"}"
+curl -X POST "http://localhost:8080/api/v1/wager/" -H "Content-Type: application/json" -H "X-User-ID: jason" -d "{\"accountId\":\"00001\",\"wagerAmount\":100.01,\"wagerTimestamp\":\"2022-01-01T00:00:00-0800\"}"
 ```
 #### Get list of wagers with pagination
 ```bash
@@ -145,40 +143,39 @@ curl -X GET "http://localhost:8080/api/v1/wager/{id}" -H "X-User-ID: jason"
 ```
 #### Update a wager
 ```bash
-curl -X PUT "http://localhost:8080/api/v1/wager/{id}" -H "Content-Type: application/json" -d "{\"account\":\"account1\",\"amount\":200.0,\"timestamp\":\"2022-01-01T00:00:00\"}"
+curl -X PUT "http://localhost:8080/api/v1/wager/{id}" -H "X-User-ID: jason" -H "Content-Type: application/json" -d "{\"accountId\":\"00001\",\"wagerAmount\":200.0,\"wagerTimestamp\":\"2022-01-01T00:00:00-0800\"}"
 ```
 #### Delete a wager
 ```bash
-curl -X DELETE "http://localhost:8080/api/v1/wager/{id}" -H "accept: */*"
+curl -X DELETE "http://localhost:8080/api/v1/wager/{id}" -H "X-User-ID: jason"
 ```
 ### Wager Summary APIs' CURL Commands
 #### Get list of wager summaries with pagination
 ```bash
-curl -X GET "http://localhost:8080/api/v1/wager-summary/" -H "accept: application/json"
+curl -X GET "http://localhost:8080/api/v1/wager-summary/?page=0&size=10&accountId=0001&totalWagerAmount=100.00&wagerTime=2022-01-01" -H "X-User-ID: jason"
 ```
 #### Get a wager summary by id
 ```bash
-curl -X GET "http://localhost:8080/api/v1/wager-summary/1" -H "accept: application/json"
+curl -X GET "http://localhost:8080/api/v1/wager-summary/{id}" -H "X-User-ID: jason"
 ```
 #### Create a new wager summary
 ```bash
-curl -X POST "http://localhost:8080/api/v1/wager-summary/" -H "Content-Type: application/json" -d "{\"account\":\"account1\",\"amount\":100.0,\"date\":\"2022-01-01\"}"
+curl -X POST "http://localhost:8080/api/v1/wager-summary/" -H "X-User-ID: jason" -H "Content-Type: application/json" -d "{\"accountId\":\"0002\",\"totalWagerAmount\":100.0,\"wagerDate\":\"2022-01-01\"}"
 ```
 #### Update a wager summary
 ```bash
-curl -X PUT "http://localhost:8080/api/v1/wager-summary/1" -H "Content-Type: application/json" -d "{\"account\":\"account1\",\"amount\":200.0,\"date\":\"2022-01-01\"}"
+curl -X PUT "http://localhost:8080/api/v1/wager-summary/{id}" -H "X-User-ID: jason" -H "Content-Type: application/json" -d "{\"accountId\":\"0002\",\"totalWagerAmount\":200.0,\"wagerDate\":\"2022-01-01\"}"
 ```
 #### Delete a wager summary
 ```bash
-curl -X DELETE "http://localhost:8080/api/v1/wager-summary/1" -H "accept: */*"
+curl -X DELETE "http://localhost:8080/api/v1/wager-summary/{id}" -H "X-User-ID: jason"
 ```
 ### ETL APIs' CURL Commands
 #### Trigger ETL transformation (Version 1)
 ```bash
-curl -X POST "http://localhost:8080/api/v1/etl/trigger" -H "accept: */*"
+curl -X POST "http://localhost:8080/api/v1/etl/trigger" -H "X-User-ID: jason"
 ```
 #### Trigger ETL transformation (Version 2)
 ```bash
-curl -X POST "http://localhost:8080/api/v2/etl/trigger" -H "accept: */*"
+curl -X POST "http://localhost:8080/api/v2/etl/trigger" -H "X-User-ID: jason"
 ```
-</details>
