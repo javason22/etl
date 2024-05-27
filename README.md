@@ -19,6 +19,7 @@ It also provides API to trigger the ETL transformation, which counts the total w
 
 - A simple generic Extractor-Transformer-Loader design for high code re-usable and extensible 
 - Standard RESTful APIs CRUD operations for wagers and wager summaries
+- Designed to run in distributed environment with MySQL and Redis
 - Pagination for wagers and wager summaries with query criteria
 - Trigger ETL transformation to summarize the wager amounts by account and day
 - Two versions of ETL transformation
@@ -70,8 +71,8 @@ mysql -h localhost -P 3307 -u root -p < ./sql/output/init.sql
 
 3. Use other MySQL client tools to execute the SQL scripts in the ./sql/input/init.sql and ./sql/output/init.sql if mysql command is not available.
 
-### Application Configuration
-Configure the MySQL and Redis connection properties in the application.yml file located in the src/main/resources directory.
+### Application Configuration (Optional)
+If you use your own MySQL and Redis server, then configure the MySQL and Redis connection properties in the application.yml file located in the src/main/resources directory.
 
 #### MySQL data sources
 The application uses two MySQL databases, one for the source database and the other for the destination database. 
