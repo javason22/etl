@@ -168,6 +168,7 @@ The application provides the following endpoints:
 The detailed API documentation was constructed by Swagger framework. After started up the ETL application, the API documentation is available at http://localhost:8080/swagger-ui.html
 
 ## CURL Commands
+All the CURL commands are provided below to access the APIs. The only authentication required is the X-User-ID header, which is used to identify the user who is accessing the APIs. The X-User-ID header is required for all the APIs' CURL commands. It is used to simulate very simple user's authentication and authorization. 
 
 ### Wager APIs' CURL Commands
 #### Create a new wager
@@ -176,27 +177,37 @@ curl -X POST "http://localhost:8080/api/v1/wager/" -H "Content-Type: application
 ```
 #### Get list of wagers with pagination
 ```bash
+# CURL command with selection criteria
 curl -X GET "http://localhost:8080/api/v1/wager/?page=0&size=10&accountId=00001&wagerAmount=100.01" -H "X-User-ID: jason"
+# CURL command without selection criteria
+curl -X GET "http://localhost:8080/api/v1/wager/?page=0&size=10" -H "X-User-ID: jason"
 ```
 #### Get a wager by id
 ```bash
+# replace {id} with the wager id in UUID format
 curl -X GET "http://localhost:8080/api/v1/wager/{id}" -H "X-User-ID: jason"
 ```
 #### Update a wager
 ```bash
+# replace {id} with the wager id in UUID format
 curl -X PUT "http://localhost:8080/api/v1/wager/{id}" -H "X-User-ID: jason" -H "Content-Type: application/json" -d "{\"accountId\":\"00001\",\"wagerAmount\":200.0,\"wagerTimestamp\":\"2022-01-01T00:00:00-0800\"}"
 ```
 #### Delete a wager
 ```bash
+# replace {id} with the wager id in UUID format
 curl -X DELETE "http://localhost:8080/api/v1/wager/{id}" -H "X-User-ID: jason"
 ```
 ### Wager Summary APIs' CURL Commands
 #### Get list of wager summaries with pagination
 ```bash
+# CURL command with selection criteria
 curl -X GET "http://localhost:8080/api/v1/wager-summary/?page=0&size=10&accountId=0001&totalWagerAmount=100.00&wagerDate=2022-01-01" -H "X-User-ID: jason"
+# CURL command without selection criteria
+curl -X GET "http://localhost:8080/api/v1/wager-summary/?page=0&size=10" -H "X-User-ID: jason"
 ```
 #### Get a wager summary by id
 ```bash
+# replace {id} with the wager summary id in UUID format
 curl -X GET "http://localhost:8080/api/v1/wager-summary/{id}" -H "X-User-ID: jason"
 ```
 #### Create a new wager summary
@@ -205,20 +216,28 @@ curl -X POST "http://localhost:8080/api/v1/wager-summary/" -H "X-User-ID: jason"
 ```
 #### Update a wager summary
 ```bash
+# replace {id} with the wager summary id in UUID format
 curl -X PUT "http://localhost:8080/api/v1/wager-summary/{id}" -H "X-User-ID: jason" -H "Content-Type: application/json" -d "{\"accountId\":\"0002\",\"totalWagerAmount\":200.0,\"wagerDate\":\"2022-01-01\"}"
 ```
 #### Delete a wager summary
 ```bash
+# replace {id} with the wager summary id in UUID format
 curl -X DELETE "http://localhost:8080/api/v1/wager-summary/{id}" -H "X-User-ID: jason"
 ```
 ### ETL APIs' CURL Commands
 #### Trigger ETL transformation (Version 1)
 ```bash
+# CURL command with paramters
 curl -X POST "http://localhost:8080/api/v1/etl/trigger" -H "Content-Type: application/json" -H "X-User-ID: jason" -d "{\"startDate\":\"2022-01-01\",\"endDate\":\"2022-01-31\",\"immediateReturn\":true}"
+# CURL command without paramters
+curl -X POST "http://localhost:8080/api/v1/etl/trigger" -H "X-User-ID: jason"
 ```
 #### Trigger ETL transformation (Version 2)
 ```bash
+# CURL command with paramters
 curl -X POST "http://localhost:8080/api/v2/etl/trigger" -H "Content-Type: application/json" -H "X-User-ID: jason" -d "{\"startDate\":\"2022-01-01\",\"endDate\":\"2022-01-31\",\"immediateReturn\":true}"
+# CURL command without paramters
+curl -X POST "http://localhost:8080/api/v2/etl/trigger" -H "X-User-ID: jason"
 ```
 ## Reference Documentation
 

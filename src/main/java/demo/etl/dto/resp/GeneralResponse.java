@@ -3,8 +3,10 @@ package demo.etl.dto.resp;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 @Schema(name = "GeneralResponse", description = "General response object")
 public class GeneralResponse {
