@@ -44,7 +44,7 @@ The following software must be installed on your machine to run the ETL applicat
 - Redis
 - Docker (optional)
 
-### MySQL and Redis Installation with Docker (Optional)
+### MySQL and Redis Installation with Docker (Optional and Recommended)
 To simplify the installation of MySQL and Redis, you can use Docker to run MySQL and Redis in containers.
 #### Step to run MySQL and Redis in Docker containers
 1. Edit the docker-compose.yml file in the project root directory to set the MySQL and Redis connection properties like username and password.
@@ -54,17 +54,21 @@ To simplify the installation of MySQL and Redis, you can use Docker to run MySQL
 docker-compose up -d
 ```
 
-3. Run the ./sql/input/init.sql script in etl-mysql-in-service container to create database_read
+3. Everything is set up. The docker-compose.yml finish all the setting for you. You can skip the MySQL installation steps below.
+
+### MySQL Setup Without Docker
+If you don't use Docker, you need to install MySQL on your machine. The following steps show you how to set up MySQL on your machine.
+1. Run the ./sql/input/init.sql script in input MySQL to create database_read
 ```bash
 mysql -h localhost -P 3306 -u root -p < ./sql/input/init.sql
 ```
 
-4. Run the ./sql/output/init.sql script in etl-mysql-out-service container to create database_write
+2. Run the ./sql/output/init.sql script in output MySQL to create database_write
 ```bash
 mysql -h localhost -P 3307 -u root -p < ./sql/output/init.sql
 ```
 
-5. Use other MySQL client tools to execute the SQL scripts in the ./sql/input/init.sql and ./sql/output/init.sql if mysql command is not available.
+3. Use other MySQL client tools to execute the SQL scripts in the ./sql/input/init.sql and ./sql/output/init.sql if mysql command is not available.
 
 ### Application Configuration
 Configure the MySQL and Redis connection properties in the application.yml file located in the src/main/resources directory.
@@ -109,13 +113,6 @@ spring:
         use_sql_comments: true
         jdbc:
           time_zone: UTC-7 # Set your own time zone so that the time objects passed in API are consistent with the MySQL database
-```
-#### Turnoff ONLY_FULL_GROUP_BY in source MySQL
-The application's v2 ETL transformation uses the GROUP BY clause in the SQL query to summarize the wager amounts by account and day. To avoid the error _"Expression #1 of SELECT list is not in GROUP BY clause and contains nonaggregated column"_, turn off the ONLY_FULL_GROUP_BY mode in the source MySQL database.
-- SQL command to turn off the ONLY_FULL_GROUP_BY mode:
-```sql
-SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
-SET PERSIST sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
 ```
 
 ### Steps to run the ETL application
@@ -249,6 +246,16 @@ curl -X POST "http://localhost:8080/api/v2/etl/trigger" -H "Content-Type: applic
 # All wagers will be extracted in this case. The immediateReturn is set to true by default.
 curl -X POST "http://localhost:8080/api/v2/etl/trigger" -H "X-User-ID: jason"
 ```
+
+### Troubleshoot ONLY_FULL_GROUP_BY exception in source MySQL
+The application's v2 ETL transformation uses the GROUP BY clause in the SQL query to summarize the wager amounts by account and day. If you see the error _"Expression #1 of SELECT list is not in GROUP BY clause and contains nonaggregated column"_, turn off the ONLY_FULL_GROUP_BY mode in the source MySQL database.
+- SQL command to turn off the ONLY_FULL_GROUP_BY mode:
+```sql
+SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+SET PERSIST sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+```
+
+
 ## Reference Documentation
 
 For further reference, please consider the following sections:
