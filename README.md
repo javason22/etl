@@ -130,12 +130,17 @@ git clone https://github.com/javason22/etl.git
 cd ./etl
 ```
 
-4. Build the project
+4. Run docker-compose.yml to setup MySQL and Redis Docker containers (Optional)
+```bash
+docker-compose up -d
+```
+
+5. Build the project
 ```bash
 mvn clean package
 ```
 
-5. Run the application
+6. Run the application
 ```bash
 cd ./target
 java -jar etl-0.0.1-SNAPSHOT.jar
