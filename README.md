@@ -46,20 +46,20 @@ The following software must be installed on your machine to run the ETL applicat
 
 ### MySQL and Redis Installation with Docker (Optional)
 To simplify the installation of MySQL and Redis, you can use Docker to run MySQL and Redis in containers.
-- Edit the docker-compose.yml file in the project root directory to set the MySQL and Redis connection properties like username and password.
-- Run docker-compose.yml in the project root directory to start MySQL and Redis containers
+1. Edit the docker-compose.yml file in the project root directory to set the MySQL and Redis connection properties like username and password.
+2. Run docker-compose.yml in the project root directory to start MySQL and Redis containers
 ```bash
 docker-compose up -d
 ```
-- Run the ./sql/input/init.sql script in etl-mysql-in-service container to create database_read
+3. Run the ./sql/input/init.sql script in etl-mysql-in-service container to create database_read
 ```bash
 mysql -h localhost -P 3306 -u root -p < ./sql/input/init.sql
 ```
-- Run the ./sql/output/init.sql script in etl-mysql-out-service container to create database_write
+4. Run the ./sql/output/init.sql script in etl-mysql-out-service container to create database_write
 ```bash
 mysql -h localhost -P 3307 -u root -p < ./sql/output/init.sql
 ```
-- Use other MySQL client tools to execute the SQL scripts in the ./sql/input/init.sql and ./sql/output/init.sql if mysql command is not available.
+5. Use other MySQL client tools to execute the SQL scripts in the ./sql/input/init.sql and ./sql/output/init.sql if mysql command is not available.
 
 ### Application Configuration
 Configure the MySQL and Redis connection properties in the application.yml file located in the src/main/resources directory.
