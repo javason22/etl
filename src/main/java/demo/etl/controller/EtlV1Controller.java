@@ -30,10 +30,9 @@ public class EtlV1Controller {
 
     @Operation(summary = "Trigger V1 ETL transform for all existing wagers to wager summaries")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = """
-                    Trigger ETL transform for all existing wagers to wager summaries.
-                    1. code=204, transform successfully.
-                    2. code=500, internal server error.""")})
+            @ApiResponse(responseCode = "202", description = "Trigger ETL transform accepted."),
+            @ApiResponse(responseCode = "400", description = "Invalid request parameters"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")})
     @PostMapping("/trigger")
     public ResponseEntity<GeneralResponse> triggerEtlTransform(@RequestBody(required = false) EtlRequest request) {
         if(request != null && (request.getStartDate() == null || request.getEndDate() == null)) {

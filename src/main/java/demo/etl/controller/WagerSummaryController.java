@@ -38,10 +38,9 @@ public class WagerSummaryController {
             @Parameter(name = "page", description = "Page number", required = true),
             @Parameter(name = "size", description = "Page size", required = true)})
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = """
-                    Page of wager summaries.
-                    1. code=200, success.
-                    2. code=400, parameters invalid.""")})
+            @ApiResponse(responseCode = "200", description = "Get a Page of wager summaries successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid parameter."),
+            @ApiResponse(responseCode = "500", description = "Internal server error.")})
     @GetMapping("/")
     public ResponseEntity<Page<WagerSummaryResponse>> list(@ModelAttribute WagerSummaryRequest request,
                                                            @RequestParam(required = false, defaultValue = "0") int page,
@@ -63,12 +62,10 @@ public class WagerSummaryController {
     @Parameters({
             @Parameter(name = "request", description = "Wager summary object", required = true)})
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = """
-                    Add wager summary.
-                    1. code=201, Created wager summary successfully.
-                    2. code=400, parameters invalid.
-                    3. code=422, duplicate wager summary creation.
-                    4. code=500, internal server error.""")})
+            @ApiResponse(responseCode = "201", description = "Created wager summary successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid parameter."),
+            @ApiResponse(responseCode = "422", description = "Duplicate wager summary creation."),
+            @ApiResponse(responseCode = "500", description = "Internal server error.")})
     @PostMapping("/")
     public ResponseEntity<WagerSummaryResponse> add(@Valid @RequestBody WagerSummaryRequest request){
         log.info("Add wager summary={}", request);
@@ -91,12 +88,10 @@ public class WagerSummaryController {
             @Parameter(name = "id", description = "Wager summary id", required = true),
             @Parameter(name = "request", description = "Wager summary object", required = true)})
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = """
-                    Update wager summary.
-                    1. code=200, success.
-                    2. code=400, parameters invalid.
-                    3. code=404, wager summary not found.
-                    4. code=500, internal server error.""")})
+            @ApiResponse(responseCode = "200", description = "Update wager summary successfully."),
+            @ApiResponse(responseCode = "404", description = "Wager summary not found."),
+            @ApiResponse(responseCode = "400", description = "Invalid parameter."),
+            @ApiResponse(responseCode = "500", description = "Internal server error.")})
     @PutMapping("/{id}")
     public ResponseEntity<WagerSummaryResponse> update(@ValidUUID @PathVariable String id, @Valid @RequestBody WagerSummaryRequest request){
         log.info("Update wager summary={}", request);
@@ -121,12 +116,10 @@ public class WagerSummaryController {
     @Parameters({
             @Parameter(name = "id", description = "Wager summary id", required = true)})
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = """
-                    Delete wager summary.
-                    1. code=200, delete wager summary successfully.
-                    2. code=400, parameters invalid.
-                    3. code=404, wager summary not found.
-                    4. code=500, internal server error.""")})
+            @ApiResponse(responseCode = "200", description = "Delete wager summary successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid parameter."),
+            @ApiResponse(responseCode = "404", description = "Wager summary not found."),
+            @ApiResponse(responseCode = "500", description = "Internal server error.")})
     @DeleteMapping("/{id}")
     public ResponseEntity<GeneralResponse> delete(@ValidUUID @PathVariable String id){
         log.info("Delete wager summary id={}", id);
@@ -141,11 +134,10 @@ public class WagerSummaryController {
     @Parameters({
             @Parameter(name = "id", description = "Wager summary id", required = true)})
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = """
-                    Get wager summary by ID.
-                    1. code=200, get wager summary successfully.
-                    2. code=400, parameters invalid.
-                    3. code=404, wager summary not found.""")})
+            @ApiResponse(responseCode = "200", description = "Get wager summary by ID successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid parameter."),
+            @ApiResponse(responseCode = "404", description = "Wager summary not found."),
+            @ApiResponse(responseCode = "500", description = "Internal server error.")})
     @GetMapping("/{id}")
     public ResponseEntity<WagerSummaryResponse> get(@ValidUUID @PathVariable String id){
         log.info("Get wager summary id={}", id);
