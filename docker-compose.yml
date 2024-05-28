@@ -2,27 +2,29 @@ version: '3.9'
 
 services:
   etl-mysql-in-service:
-    image: mysql:latest
+    image: mysql:8
     container_name: etl-mysql-in-service
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: database_read
     ports:
       - '3306:3306'
-    command: --default-authentication-plugin=mysql_native_password
+    command: --mysql-native-password=ON
     networks:
       - etl-backend
     volumes:
       - ./sql/input/:/docker-entrypoint-initdb.d/
   etl-mysql-out-service:
-    image: mysql:latest
+    image: mysql:8
     container_name: etl-mysql-out-service
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: database_write
     ports:
       - '3307:3306'
-    command: --default-authentication-plugin=mysql_native_password
+    command: --mysql-native-password=ON
     networks:
       - etl-backend
     volumes:

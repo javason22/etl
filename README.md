@@ -39,9 +39,9 @@ It also provides API to trigger the ETL transformation, which counts the total w
 
 ### Prerequisites
 The following software must be installed on your machine to run the ETL application:
-- Java JDK
+- Java JDK 17
 - Maven
-- MySQL
+- MySQL 8
 - Redis
 - Docker (optional)
 
