@@ -22,6 +22,7 @@ spring:
         use_sql_comments: true
         jdbc:
           time_zone: UTC-7
+        dialect: org.hibernate.dialect.MySQL8Dialect
   jackson:
     serialization:
       indent-output: true

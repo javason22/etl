@@ -156,20 +156,26 @@ With ddl-auto attribute in application.yml set to 'update', the necessary tables
 The application provides the following endpoints:  
 
 ### Wager API
-- GET /api/v1/wager/ - Get list of wager from source database with pagination
-- GET /api/v1/wager/{id} - Get a wager from source database by id
-- POST /api/v1/wager/ - Create a new wager into source database
-- PUT /api/v1/wager/{id} - Update a wager in source database by id
-- DELETE /api/v1/wager/{id} - Delete a wager from source database by id
+| Endpoint                    | Description                                            |
+|-----------------------------|--------------------------------------------------------|
+| `GET /api/v1/wager/`        | Get list of wager from source database with pagination |
+| `GET /api/v1/wager/{id}`    | Get a wager from source database by id                 |
+| `POST /api/v1/wager/`       | Create a new wager into source database                |
+| `PUT /api/v1/wager/{id}`    | Update a wager in source database by id                |
+| `DELETE /api/v1/wager/{id}` | Delete a wager from source database by id              |
 ### Wager Summary API
-- GET /api/v1/wager-summary/ - Get list of wager summaries from destination database with pagination
-- GET /api/v1/wager/{id} - Get a wager summary from destination database by id
-- POST /api/v1/wager/ - Create a new wager into destination database summary
-- PUT /api/v1/wager/{id} - Update a wager summary in destination database by id
-- DELETE /api/v1/wager/{id} - Delete a wager summary from destination database by id
+| Endpoint                     | Description                                                           |
+|------------------------------|-----------------------------------------------------------------------|
+| `GET /api/v1/wager-summary/` | Get list of wager summaries from destination database with pagination |
+| `GET /api/v1/wager/{id}`     | Get a wager summary from destination database by id                   |
+| `POST /api/v1/wager/`        | Create a new wager into destination database summary                  |
+| `PUT /api/v1/wager/{id}`     | Update a wager summary in destination database by id                  |
+| `DELETE /api/v1/wager/{id}`  | Delete a wager summary from destination database by id                |
 ### ETL API
-- POST /api/v1/etl/trigger - Trigger the ETL transformation to summarize the wager amounts by account and day (version 1). Version 1 summarize the wager amounts by account and day in Java code.
-- POST /api/v2/etl/trigger - Trigger the ETL transformation to summarize the wager amounts by account and day (version 2). Version 2 delegates the sum of wager amount to MySQL. It uses GROUP BY clause in the SQL query to summarize the wager amounts by account and day.
+| Endpoint                   | Description                                                                                                                                                                                                                                    |
+|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `POST /api/v1/etl/trigger` | Trigger the ETL transformation to summarize the wager amounts by account and day (version 1). Version 1 summarize the wager amounts by account and day in Java code                                                                            |
+| `POST /api/v2/etl/trigger` | Trigger the ETL transformation to summarize the wager amounts by account and day (version 2). Version 2 delegates the sum of wager amount to MySQL. It uses GROUP BY clause in the SQL query to summarize the wager amounts by account and day |
 
 ## Swagger API Documentation
 The detailed API documentation was constructed by Swagger framework. After started up the ETL application, the API documentation is available at http://localhost:8080/swagger-ui.html
