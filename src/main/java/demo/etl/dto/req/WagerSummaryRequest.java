@@ -16,7 +16,7 @@ public class WagerSummaryRequest {
 
     @Schema(description = "Account ID")
     @NotNull(message = "Account ID is mandatory")
-    @Size(message = "Account ID cannot be empty")
+    @Size(message = "Account ID length should be between 1 and 50 characters", min = 1, max = 50)
     private String accountId;
 
     @Schema(description = "Wager date")

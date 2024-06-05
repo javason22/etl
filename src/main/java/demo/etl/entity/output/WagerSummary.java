@@ -28,7 +28,7 @@ public class WagerSummary implements Serializable {
     @Column(name = "ID", nullable = false, columnDefinition = "VARCHAR(36)")
     private String id;
 
-    @Column(name = "ACCOUNT_ID", nullable = false)
+    @Column(name = "ACCOUNT_ID", nullable = false, length = 50)
     private String accountId;
 
     @Column(name = "WAGER_DATE", columnDefinition = "DATE", nullable = false)

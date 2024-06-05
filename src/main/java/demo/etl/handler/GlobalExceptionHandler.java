@@ -6,6 +6,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -113,6 +114,20 @@ public class GlobalExceptionHandler {
         Map<String, String> errors = new HashMap<>();
         errors.put("id", "Invalid ID - UUID format is required");
         Map <String, Object> response = Map.of("status", HttpStatus.BAD_REQUEST.toString(), "errors", errors);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handle HttpMessageNotReadableException that is thrown when JSON request body is invalid.
+     *
+     * @param e exception
+     * @return response entity
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<GeneralResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e){
+        log.error("An HttpMessageNotReadableException occurred", e);
+        GeneralResponse response = new GeneralResponse(HttpStatus.BAD_REQUEST.toString(),
+                "Invalid request body");
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }

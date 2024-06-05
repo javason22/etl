@@ -15,7 +15,7 @@ import java.util.Date;
 public class WagerRequest {
 
     @Schema(description = "Account ID")
-    @Size(min = 1, message = "Account ID cannot be empty")
+    @Size(min = 1, max = 50, message = "Account ID length should be between 1 and 50 characters")
     @NotNull(message = "Account ID is mandatory")
     private String accountId;
 
