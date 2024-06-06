@@ -31,7 +31,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<GeneralResponse> handleAllExceptions(Exception e){
-        log.error("An unexpected error occurred", e);
+        //log.error("An unexpected error occurred", e);
         GeneralResponse response = new GeneralResponse(HttpStatus.INTERNAL_SERVER_ERROR.toString(),
                 "Something went wrong");
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -46,7 +46,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<GeneralResponse> handleDataIntegrityViolationExceptions(Exception e){
-        log.error("An DataIntegrityViolationException occurred", e);
+        //log.error("An DataIntegrityViolationException occurred", e);
         GeneralResponse response = new GeneralResponse(HttpStatus.UNPROCESSABLE_ENTITY.toString(),
                 "Duplicate item found");
         return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
@@ -61,7 +61,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(DataRetrievalFailureException.class)
     public ResponseEntity<GeneralResponse> handleDataRetrievalFailureExceptions(Exception e){
-        log.error("An DataRetrievalFailureException occurred", e);
+        //log.error("An DataRetrievalFailureException occurred", e);
         GeneralResponse response = new GeneralResponse(HttpStatus.NOT_FOUND.toString(),
                 "Request item not found: " + e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
@@ -75,7 +75,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<GeneralResponse> handleMethodArgumentTypeMismatchExceptions(MethodArgumentTypeMismatchException e){
-        log.error("An MethodArgumentTypeMismatchException occurred", e);
+        //log.error("An MethodArgumentTypeMismatchException occurred", e);
         GeneralResponse response = new GeneralResponse(HttpStatus.BAD_REQUEST.toString(),
                 MessageFormat.format("Invalid parameter type: request parameter:{0}, required type:{1}",
                         e.getName(), Objects.requireNonNull(e.getRequiredType()).getName()));
@@ -110,7 +110,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<Map<String, Object>> handleHandlerMethodValidationException(HandlerMethodValidationException e){
-        log.error("Validation Failed", e);
+        //log.error("Validation Failed", e);
         Map<String, String> errors = new HashMap<>();
         errors.put("id", "Invalid ID - UUID format is required");
         Map <String, Object> response = Map.of("status", HttpStatus.BAD_REQUEST.toString(), "errors", errors);
@@ -125,7 +125,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<GeneralResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e){
-        log.error("An HttpMessageNotReadableException occurred", e);
+        //log.error("An HttpMessageNotReadableException occurred", e);
         GeneralResponse response = new GeneralResponse(HttpStatus.BAD_REQUEST.toString(),
                 "Invalid request body");
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
